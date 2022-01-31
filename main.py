@@ -2,20 +2,20 @@ import json
 import re
 from urllib.request import urlopen
 
-book_api    = "https://www.googleapis.com/books/v1/volumes?q=isbn:1250297621"
+book_api    = "https://www.googleapis.com/books/v1/volumes?q=isbn:0316531243"
 resp        = urlopen(book_api)
 book_data=json.load(resp)
 
 # volume_info = book_data['volumeInfo']
-desc        = re.split('”|-|\s|<b>|</b>|<i>|</i>|<br>|</br>',book_data['items'][0]['volumeInfo']['description'])
-print(desc)
+desc        = re.split('”|-|\s|<b>|</b>|<i>|</i>|<br>|</br>|<p>|</p>',book_data['items'][0]['volumeInfo']['description'])
+#print(desc)
 book_api=book_data["items"][0]["selfLink"]
 resp=urlopen(book_api)
 book_data   = json.load(resp)
 # print(book_data)
-desc2 = re.split('”|-|\s|<b>|</b>|<i>|</i>|<br>|</br>',book_data['volumeInfo']['description'])
+desc2 = re.split('”|-|\s|<b>|</b>|<i>|</i>|<br>|</br>|<p>|</p>',book_data['volumeInfo']['description'])
 desc.extend(desc2)
-print(desc)
+#print(desc)
 
 # print(book_data)
 #if book_data["totalItems"] > 0:
@@ -26,14 +26,14 @@ potential_authors = []
 for index,word in enumerate(desc):
     # word = re.sub(r"<br>","",word)
     # word = re.sub(r"</br>","",word)     
-    word = re.sub(r"”|<b>|</b>|<i>|</i>|<br>|</br>|[^a-zA-Z]|","",word)
+    word = re.sub(r"”|<b>|</b>|<i>|</i>|<br>|</br>|<p>|</p>|[^a-zA-Z]|","",word)
     # print(word)
 
     # The book description must have at least two words 
     if index > 0:
         # lastword = re.sub(r"<br>","",desc[index-1])
         # lastword = re.sub(r"</br>","",desc[index-1])
-        lastword = re.sub(r"”|<b>|</b>|<i>|</i>|<br>|</br>|[^a-zA-Z]","",desc[index-1])
+        lastword = re.sub(r"”|<b>|</b>|<i>|</i>|<br>|</br>|<p>|</p>|[^a-zA-Z]","",desc[index-1])
         # print(lastword)
         # The current word and the previous word must be title case to be considered as a potential author name
         if word.istitle() and lastword.istitle():
