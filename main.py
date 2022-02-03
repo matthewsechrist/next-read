@@ -1,57 +1,49 @@
+from curses.ascii import isalpha, isupper
 import json
 import re
 from urllib.request import urlopen
 
-book_api    = "https://www.googleapis.com/books/v1/volumes?q=isbn:0316531243"
+# 0316531243
+# 031653126X
+
+book_api    = "https://www.googleapis.com/books/v1/volumes?q="+"031653126X"
+
 resp        = urlopen(book_api)
-book_data=json.load(resp)
+book_data   =json.load(resp)
 
-# volume_info = book_data['volumeInfo']
-desc        = re.split('”|-|\s|<b>|</b>|<i>|</i>|<br>|</br>|<p>|</p>',book_data['items'][0]['volumeInfo']['description'])
-#print(desc)
+desc        = re.split('\W',book_data['items'][0]['volumeInfo']['description'])
+
+filtered = filter(None,desc)
+
+desc2 = [x for x in filtered if x[0].isupper()]
+
 book_api=book_data["items"][0]["selfLink"]
-resp=urlopen(book_api)
-book_data   = json.load(resp)
-# print(book_data)
-desc2 = re.split('”|-|\s|<b>|</b>|<i>|</i>|<br>|</br>|<p>|</p>',book_data['volumeInfo']['description'])
-desc.extend(desc2)
-#print(desc)
+resp2=urlopen(book_api)
+book_data   = json.load(resp2)
+desc3 = re.split('\W',book_data['volumeInfo']['description'])
+filtered2 = filter(None,desc3)
 
-# print(book_data)
-#if book_data["totalItems"] > 0:
-# volume_info = book_data["volumeInfo"]
-# desc        = volume_info['description'].split(' ')
+desc4 = [x for x in filtered2 if x[0].isupper()]
+print(desc2)
+desc2.extend(desc4)
+
 potential_authors = []
-# print(desc)
-for index,word in enumerate(desc):
-    # word = re.sub(r"<br>","",word)
-    # word = re.sub(r"</br>","",word)     
-    word = re.sub(r"”|<b>|</b>|<i>|</i>|<br>|</br>|<p>|</p>|[^a-zA-Z]|","",word)
-    # print(word)
+potential_author = ''
+for index,word in enumerate(desc2):
+    potential_author = desc2[index-1]+"+"+desc2[index]
+        
+    if potential_author not in potential_authors and desc2[index].isupper() and desc2[index-1].isupper():
+        potential_authors.append(potential_author)
+#print([potential_authors])
 
-    # The book description must have at least two words 
-    if index > 0:
-        # lastword = re.sub(r"<br>","",desc[index-1])
-        # lastword = re.sub(r"</br>","",desc[index-1])
-        lastword = re.sub(r"”|<b>|</b>|<i>|</i>|<br>|</br>|<p>|</p>|[^a-zA-Z]","",desc[index-1])
-        # print(lastword)
-        # The current word and the previous word must be title case to be considered as a potential author name
-        if word.istitle() and lastword.istitle():
-            potential_author =  lastword+"+"+word
-            # print(potential_author)
-            
-            # Do not want to add duplicates to the potential_authors list
-            if potential_author not in potential_authors:
-                potential_authors.append(potential_author)
-
-# print(potential_authors)
 for item in potential_authors:
     author_api         = "https://www.googleapis.com/books/v1/volumes?q=inauthor:\""+item+"\""
     author_resp        = urlopen(author_api)
     author_data         = json.load(author_resp)
-    
+#    print(author_api)
     if author_data["totalItems"] > 0:
-        author_volume_info = author_data["items"][0]["volumeInfo"]
-        authors        = author_volume_info['authors']
-        if item.replace('+',' ') in authors:
-            print(item.replace('+',' '))
+        # author_volume_info = author_data["volumeInfo"]
+        # authors        = author_volume_info['authors']
+        # if item.replace('+',' ') in authors:
+        #    print(item.replace('+',' '))
+        print(item)
