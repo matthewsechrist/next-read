@@ -2,6 +2,9 @@
     "folders": [
         {
             "path": "."
+        },
+        {
+            "path": "../cloud_resume_front_end"
         }
     ]
 }

@@ -1,57 +1,19 @@
-<!DOCTYPE html>
 <html>
-	
-<head>
-	<title>
-		Creating Search Bar using HTML
-		CSS and Javascript
-	</title>
-	
-	<!-- linking the stylesheet(CSS) -->
-	<link rel="stylesheet" type="text/css" href="./style.css">
-</head>
-
 <body>
-	
-	<!-- input tag -->
-	<input id="searchbar" onkeyup="search_animal()" type="text"
-		name="search" placeholder="Search animals..">
-	
-	<!-- ordered list -->
-	<ol id='list'>
-		<li class="animals">Cat</li>
-		<li class="animals">Dog</li>
-		<li class="animals">Elephant</li>
-		<li class="animals">Fish</li>
-		<li class="animals">Gorilla</li>
-		<li class="animals">Monkey</li>
-		<li class="animals">Turtle</li>
-		<li class="animals">Whale</li>
-		<li class="animals">Aligator</li>
-		<li class="animals">Donkey</li>
-		<li class="animals">Horse</li>
-	</ol>
-	
-	<!-- linking javascript -->
-	<script src="./animals.js"></script>
+
+<p>This example demonstrates how to assign an "onkeyup" event to an input element.</p>
+
+<p>Press a key inside the text field and release it to set the text to uppercase.</p>
+
+Enter your name: <input type="text" id="search" onkeyup="books()">
+<div id="content">a</div>
+
+<div class="footer">
+	<script type="text/javascript" src="books.js"></script>
+	<p class="grey-text text-lighten-4">Books:
+		<span id="books"></span>
+	</p>
+</div>
+
 </body>
-
-
-  <head>
-    <title>Books API Example</title>
-  </head>
-  <body>
-    <div id="content"></div>
-    <script>
-      function handleResponse(response) {
-      for (var i = 0; i < response.items.length; i++) {
-        var item = response.items[i];
-        // in production code, item.text should have the HTML entities escaped.
-        document.getElementById("content").innerHTML += "<br>" + item.volumeInfo.title;
-      }
-    }
-    </script>
-    <script src="https://www.googleapis.com/books/v1/volumes?q=steve_cavanagh&callback=handleResponse"></script>
-  </body>
 </html>
-
