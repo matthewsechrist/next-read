@@ -8,7 +8,7 @@ async function books() {
     const response = await fetch(
       "https://www.googleapis.com/books/v1/volumes?q=${" +
         search_item +
-        "}&maxResults=10",
+        "}&maxResults=20",
       {
         method: "GET",
       }
@@ -66,7 +66,7 @@ async function get_stuff(isbn) {
     .then((response2) => response2.text())
     .then((body) => {
       var obj = JSON.parse(body);
-	//   console.log(obj);
+	   console.log(body);
 	//   console.log(body);
       div.append("ISBN:" + isbn.toString());
       document.getElementById(isbn.toString()).append("ISBN:" + isbn.toString()+JSON.stringify(obj));
