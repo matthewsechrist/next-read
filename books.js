@@ -1,3 +1,5 @@
+var authors;
+
 async function books() {
   const search_item = document
     .getElementById("search")
@@ -6,7 +8,7 @@ async function books() {
   document.getElementById("content").innerHTML = "";
   if (search_item) {
     const response = await fetch(
-      "https://www.googleapis.com/books/v1/volumes?q=${" +
+      "https://www.googleapis.com/books/v1/volumes?q=inauthor:${" +
         search_item +
         "}&maxResults=20",
       {
@@ -66,10 +68,17 @@ async function get_stuff(isbn) {
     .then((response2) => response2.text())
     .then((body) => {
       var obj = JSON.parse(body);
-	   console.log(body);
+console.log(obj.keys());
+      // for (let i in obj.author) {
+        authors += obj;
+        // console.log(obj.author[i]);
+      // }
+      authors+=JSON.stringify(obj);
+	   //console.log(obj);
 	//   console.log(body);
       div.append("ISBN:" + isbn.toString());
       document.getElementById(isbn.toString()).append("ISBN:" + isbn.toString()+JSON.stringify(obj));
+      document.getElementById("authors").append(obj[0].author);
     })
     .catch(function (error) {
       console.log(error);
