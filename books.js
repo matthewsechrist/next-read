@@ -1,96 +1,109 @@
-var authors;
+var authors = [],
+  isbn,
+  isbns = [],
+  newAuthor = [],
+  newAuthors = [],
+  search_item;
 
-async function books() {
-  const search_item = document
-    .getElementById("search")
-    .value.replaceAll(" ", "+");
+async function getBooks() {
+  search_item = document.getElementById("search").value.replaceAll(" ", "+");
 
   document.getElementById("content").innerHTML = "";
+  document.getElementById("authors").innerHTML = "";
+
   if (search_item) {
-    const response = await fetch(
+    document.createElement("authors");
+
+    let books = await fetch(
       "https://www.googleapis.com/books/v1/volumes?q=inauthor:${" +
         search_item +
-        "}&maxResults=20",
-      {
-        method: "GET",
-      }
-    )
-      .then((response) => response.text())
-      .then((body) => {
-        document.getElementById("content").value = "";
-        var obj = JSON.parse(body);
+        "}&maxResults=10"
+    ).then((response) => response.json());
+    this.books = books;
 
-        for (var i = 0; i < obj.items.length; i++) {
-          var parent = this.parentNode;
+    for (i in books.items) {
+      isbn = books.items[i].volumeInfo.industryIdentifiers;
+      for (var j = 0; j < isbn.length; j++) {
+        if (
+          isbn[j].type === "ISBN_10" &&
+          books.items[i].volumeInfo.description
+        ) {
+          document
+            .getElementById("content")
+            .append(isbn[j].identifier.toString());
+          isbns.push(isbn[j].identifier);
 
-          isbn = obj.items[i].volumeInfo.industryIdentifiers;
+          if (books.items[i].volumeInfo.imageLinks)
+            var src = books.items[i].volumeInfo.imageLinks.thumbnail.replace(
+              "http://",
+              "https://"
+            );
+          (img = document.createElement("img")),
+            (div = document.createElement("div"));
 
-          for (var j = 0; j < isbn.length; j++) {
-            if (isbn[j].type === "ISBN_10" && obj.items[i].volumeInfo.description) {
+          div.setAttribute("id", isbn[j].identifier.toString());
 
-				var src = obj.items[i].volumeInfo.imageLinks.thumbnail.replace('http://','https://');
-				img = document.createElement("img"),
-				div = document.createElement("div");
+          img.id = isbn[j].identifier;
 
-				div.setAttribute("id",isbn[j].identifier.toString());
-	
-              get_stuff(isbn[j].identifier);
-              img.id = isbn[j].identifier;
-
-			  img.src = src;
-			  document.getElementById("content").appendChild(div);
-			  document.getElementById(isbn[j].identifier.toString()).append(img);
-			  //document.getElementById(isbn[j].identifier.toString()).append(obj.items[i].volumeInfo.description.industryIdentifiers.categories.toString());	
-	
-            }
-          }
+          img.src = src;
+          document.getElementById("content").appendChild(div);
+          document.getElementById(isbn[j].identifier.toString()).append(img);
         }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  } else document.getElementById("content").innerHTML = "";
+      }
+    }
+  }
+  filtered_isbns = isbns.filter(Boolean);
+  console.log(filtered_isbns);
+  for (i in filtered_isbns) {
+    await get_stuff(filtered_isbns[i]);
+  }
+  addAuthors();
 }
 
 async function get_stuff(isbn) {
   var parent = this.parentNode;
+  console.log(isbn);
 
   var div = document.createElement("div");
 
-  const response2 = await fetch(
+  const response = await fetch(
     "https://uk4tq4pat9.execute-api.us-east-1.amazonaws.com/Prod/execution",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: '{"book":"' + isbn + '"}',
     }
-  )
-    .then((response2) => response2.text())
-    .then((body) => {
-      var obj = JSON.parse(body);
-console.log(obj.keys());
-      // for (let i in obj.author) {
-        authors += obj;
-        // console.log(obj.author[i]);
-      // }
-      authors+=JSON.stringify(obj);
-	   //console.log(obj);
-	//   console.log(body);
-      div.append("ISBN:" + isbn.toString());
-      document.getElementById(isbn.toString()).append("ISBN:" + isbn.toString()+JSON.stringify(obj));
-      document.getElementById("authors").append(obj[0].author);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  ).then((response) => response.json());
+  this.response = response;
+
+  authors.push(response);
+
+  div.append("ISBN:" + isbn.toString());
+  document
+    .getElementById(isbn.toString())
+    .append("ISBN:" + isbn.toString() + JSON.stringify(response));
 }
 
 var input = document.getElementById("search");
 input.addEventListener("keyup", function (event) {
   if (event.key === "Enter") {
     event.preventDefault();
-    books();
+    document.getElementById("content").innerHTML = "";
+    document.getElementById("authors").innerHTML = "";
+
+    getBooks();
   }
 });
+async function addAuthors() {
+  newAuthor = authors.flat();
+  newAuthors = newAuthor.filter(Boolean);
+  
+  unique = [...new Map(newAuthors.map((v) => [JSON.stringify(v), v])).values()].sort((a, b) => b[1] - a[1]);
 
-books();
+
+  if (search_item) {
+    document.getElementById("authors").append(JSON.stringify(unique));
+  }
+}
+
+getBooks();
