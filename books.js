@@ -110,6 +110,8 @@ function addAuthors() {
   // Step 2 of 3 - Remove "falsy" authors from the flattened_authors array
   filtered_authors = flattened_authors.filter(Boolean);
   
+  // Need to remove duplicates by author name
+
   // Step 3 of 3 - Final authors author is first converted to a map, the sorted in descending order, then converted back to a correctly ordered array
   sorted_authors = [...new Map(filtered_authors.map((v) => [JSON.stringify(v), v])).values()].sort((a, b) => b[1] - a[1]);
 

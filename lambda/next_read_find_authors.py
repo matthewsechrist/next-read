@@ -31,5 +31,5 @@ def next_read_find_authors(event, context):
                     print(author)
                     print(potential_author.replace('+',' ').lower() == author.lower())
                     mentioned_authors.append({"author":potential_author})
-            #return {"author":potential_author,"books":book_data['totalItems']}     
-            return [potential_author,book_data['totalItems']]
+                
+                    return [potential_author,book_data['totalItems']]
