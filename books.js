@@ -9,8 +9,8 @@ async function searchAuthor() {
   // Set searched_author variable to searched valued
   searched_author = document.getElementById("search").value;
 
-  authors         = [],
-  isbns           = []  
+  authors = [],
+  isbns   = []  
 
   // Null out HTML elements for book content and authors
   document.getElementById("content").innerHTML = "";
