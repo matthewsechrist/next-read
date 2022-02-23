@@ -2,6 +2,7 @@ var authors = [],
   isbns = [],
   flattened_authors = [],
   filtered_authors = [],
+  ordered_authors = [],
   dictionary_authors = {},
   isbn = "",
   searched_author = "";
@@ -118,30 +119,38 @@ function addAuthors() {
 
   // Step 2 of 3 - Remove "falsy" authors from the flattened_authors array
   filtered_authors = flattened_authors.filter(Boolean);
-  // Need to remove duplicates by author name
 
-  // Step 3 of 3 - Create a dictionary of authors which does not allow duplicates of authors,
+  // Step 3 of 5 - Need to remove currently searched author name from the array
+  for (author_index in filtered_authors) {
+    if (
+      filtered_authors[author_index].author.toLowerCase() == searched_author.toLowerCase()) {
+      filtered_authors.splice(author_index, 1);
+    }
+  }
+
+  // Step 4 of 5 - Create a dictionary of authors which does not allow duplicates of authors,
   // and this maps the JSON returned in the format author:books
   dictionary_authors = Object.assign(
     {},
     ...filtered_authors.map((x) => ({ [x.author]: x.books }))
   );
 
+  // Step 5 of 5 - Create and sort the ordered_authors array in descending order, mimicking relevancy of authors found
   var ordered_authors = Object.keys(dictionary_authors).map(function (key) {
     return [key, dictionary_authors[key]];
   });
-
-  // Sorts the ordered_authors array in descending order, mimicking relevancy of authors
   ordered_authors.sort(function (first, second) {
     return second[1] - first[1];
   });
 
   // Only add the authors HTML div only after an author has been searched
   if (searched_author) {
-    //  document.getElementById("authors").append(JSON.stringify(sorted_authors));
-    for (i in ordered_authors){
-    document.getElementById("authors").append(ordered_authors[i][0] + ordered_authors[i][1]);
-  }}
+    for (i in ordered_authors) {
+      document
+        .getElementById("authors")
+        .append(ordered_authors[i][0] + ordered_authors[i][1]);
+    }
+  }
 }
 
 searchAuthor();
