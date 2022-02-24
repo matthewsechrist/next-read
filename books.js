@@ -1,11 +1,11 @@
-var  authors            =
-    (isbns              =
-     flattened_authors  =
-     filtered_authors   =
-     ordered_authors    = []),
-     dictionary_authors = {},
-     isbn               = 
-  (searched_author      = "");
+var authors =
+    (isbns =
+    flattened_authors =
+    filtered_authors =
+    ordered_authors =
+      []),
+  dictionary_authors = {},
+  isbn = (searched_author = "");
 
 async function searchAuthor() {
   // Set searched_author variable to searched valued
@@ -91,7 +91,7 @@ async function getMentionedAuthors(isbn) {
   var div = document.createElement("div");
 
   const response = await fetch(
-    "https://uk4tq4pat9.execute-api.us-east-1.amazonaws.com/Prod/execution",
+    "https://nextreadapi.matthewsechrist.cloud/Prod/execution",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
