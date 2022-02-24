@@ -91,7 +91,7 @@ async function getMentionedAuthors(isbn) {
   var div = document.createElement("div");
 
   const response = await fetch(
-    "https://nextreadapi.matthewsechrist.cloud/Prod/execution",
+    "https://api.matthewsechrist.cloud/book",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
