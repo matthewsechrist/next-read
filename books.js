@@ -1,11 +1,11 @@
-var authors = [],
-  isbns = [],
-  flattened_authors = [],
-  filtered_authors = [],
-  ordered_authors = [],
-  dictionary_authors = {},
-  isbn = "",
-  searched_author = "";
+var  authors            =
+    (isbns              =
+     flattened_authors  =
+     filtered_authors   =
+     ordered_authors    = []),
+     dictionary_authors = {},
+     isbn               = 
+  (searched_author      = "");
 
 async function searchAuthor() {
   // Set searched_author variable to searched valued
@@ -14,16 +14,16 @@ async function searchAuthor() {
   (authors = []), (isbns = []);
 
   // Null out HTML elements for book content and authors
-  document.getElementById("content").innerHTML = "";
-  document.getElementById("associated_authors").innerHTML = "";
-  document.getElementById("current_author").innerHTML = "";
-
+  document.getElementById("content").innerHTML =
+    document.getElementById("associated_authors").innerHTML =
+    document.getElementById("current_author").innerHTML =
+      "";
 
   // If a valid author is searched, pull the first 10 books for the searched author
   if (searched_author) {
     document
-    .getElementById("current_author")
-    .append("BOOKS BY "+searched_author.toUpperCase());
+      .getElementById("current_author")
+      .append("BOOKS BY " + searched_author.toUpperCase());
 
     document.createElement("associated_authors");
 
@@ -45,7 +45,6 @@ async function searchAuthor() {
           isbn[j].type === "ISBN_10" &&
           books.items[book].volumeInfo.description
         ) {
-
           isbns.push(isbn[j].identifier);
 
           // Need to change from HTTP to HTTPS for the Google Books image link
@@ -67,8 +66,10 @@ async function searchAuthor() {
           // Add HTML elements
           document.getElementById("content").appendChild(div);
           document.getElementById(isbn[j].identifier.toString()).append(img);
-          if (books.items[book].volumeInfo.title){
-          document.getElementById(isbn[j].identifier.toString()).append(books.items[book].volumeInfo.title);
+          if (books.items[book].volumeInfo.title) {
+            document
+              .getElementById(isbn[j].identifier.toString())
+              .append(books.items[book].volumeInfo.title);
           }
         }
       }
@@ -101,11 +102,12 @@ async function getMentionedAuthors(isbn) {
   this.response = response;
 
   authors.push(response);
-if (books.items[book].volumeInfo.title){
-  document
-    .getElementById(isbn.toString())
-    .append(books.items[book].volumeInfo.title);
-}}
+  if (books.items[book].volumeInfo.title) {
+    document
+      .getElementById(isbn.toString())
+      .append(books.items[book].volumeInfo.title);
+  }
+}
 
 // Call the searchAuthor() function from the Enter key, also the "Click Me!" button
 var input = document.getElementById("search");
@@ -146,20 +148,26 @@ function addAuthors() {
   // Only add the authors HTML div only after an author has been searched
   if (searched_author) {
     document
-    .getElementById("associated_authors")
-    .append("Here are the mentioned authors:");
+      .getElementById("associated_authors")
+      .append("Here are the mentioned authors:");
 
     for (author_index in ordered_authors) {
-
       // Remove the currently searched author, no need to see duplicates
       if (
-        ordered_authors[author_index][0].toLowerCase() == searched_author.toLowerCase()) {
-          ordered_authors.splice(author_index, 1);
+        ordered_authors[author_index][0].toLowerCase() ==
+        searched_author.toLowerCase()
+      ) {
+        ordered_authors.splice(author_index, 1);
       }
-  
+
       document
         .getElementById("associated_authors")
-        .append(ordered_authors[author_index][0] + " has "+ ordered_authors[author_index][1].toString() + " associated books.");
+        .append(
+          ordered_authors[author_index][0] +
+            " has " +
+            ordered_authors[author_index][1].toString() +
+            " associated books."
+        );
     }
   }
 }
