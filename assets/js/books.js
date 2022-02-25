@@ -7,6 +7,10 @@ var authors =
   dictionary_authors = {},
   isbn = (searched_author = "");
 
+  const spinner = document.getElementById("spinner");
+
+  //const spinner = document.getElementById("associated_authors");
+
 async function searchAuthor() {
   // Set searched_author variable to searched valued
   searched_author = document.getElementById("search").value;
@@ -66,6 +70,7 @@ async function searchAuthor() {
           // Add HTML elements
           document.getElementById("content").appendChild(div);
           document.getElementById(isbn[j].identifier.toString()).append(img);
+
           if (books.items[book].volumeInfo.title) {
             document
               .getElementById(isbn[j].identifier.toString())
@@ -79,16 +84,20 @@ async function searchAuthor() {
   // Remove any "falsy" ISBNs
   filtered_isbns = isbns.filter(Boolean);
 
+  spinner.removeAttribute('hidden');
+  
   // Pseudo-concurrently retrieve all potential authors mentioned in the book description
   await Promise.allSettled(
     filtered_isbns.map((stuff) => getMentionedAuthors(stuff))
   );
 
   addAuthors();
+
+  spinner.setAttribute('hidden', '');
 }
 
 async function getMentionedAuthors(isbn) {
-  var div = document.createElement("div");
+  
 
   const response = await fetch(
     "https://api.matthewsechrist.cloud/book",
@@ -98,6 +107,8 @@ async function getMentionedAuthors(isbn) {
       body: '{"book":"' + isbn + '"}',
     }
   ).then((response) => response.json());
+
+  //spinner.setAttribute('hidden', '');
 
   this.response = response;
 
@@ -122,6 +133,9 @@ input.addEventListener("keyup", function (event) {
 // This function adds the authors to HTML in order of number of books associated by author in descending order,
 // mimicking a sort by relevancy
 function addAuthors() {
+
+   div = document.createElement("div");
+
   // Step 1 of 3 - Flatten multiple author arrays into one authors array
   flattened_authors = authors.flat();
 
@@ -147,11 +161,19 @@ function addAuthors() {
 
   // Only add the authors HTML div only after an author has been searched
   if (searched_author) {
+    
+
+    
+
     document
-      .getElementById("associated_authors")
+      .getElementById("associated_authors")      
       .append("Here are the mentioned authors:");
 
+
     for (author_index in ordered_authors) {
+      author_div = document.createElement("div");
+
+
       // Remove the currently searched author, no need to see duplicates
       if (
         ordered_authors[author_index][0].toLowerCase() ==
@@ -160,16 +182,22 @@ function addAuthors() {
         ordered_authors.splice(author_index, 1);
       }
 
+      author_div.setAttribute("id", "author"+author_index.toString());
+
+      document.getElementById("associated_authors").appendChild(author_div);
+
       document
-        .getElementById("associated_authors")
-        .append(
-          ordered_authors[author_index][0] +
-            " has " +
-            ordered_authors[author_index][1].toString() +
-            " associated books."
-        );
+      .getElementById("author"+author_index.toString())
+      .append(ordered_authors[author_index][0] +
+        " has " +
+        ordered_authors[author_index][1].toString() +
+        " associated books.");
+ 
     }
   }
 }
 
 searchAuthor();
+
+
+
