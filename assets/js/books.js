@@ -7,9 +7,9 @@ var authors =
   dictionary_authors = {},
   isbn = (searched_author = "");
 
-  const spinner = document.getElementById("spinner");
+const spinner = document.getElementById("spinner");
 
-  //const spinner = document.getElementById("associated_authors");
+//const spinner = document.getElementById("associated_authors");
 
 async function searchAuthor() {
   // Set searched_author variable to searched valued
@@ -39,7 +39,7 @@ async function searchAuthor() {
 
     this.books = books;
 
-    // Each book results must have a 10 digint ISBN and a book description. An array of ISBNs is created
+    // Each book results must have a 10 digit ISBN and a book description. An array of ISBNs is created
     // for further processing in the getMentionedAuthors() function
     for (var book in books.items) {
       isbn = books.items[book].volumeInfo.industryIdentifiers;
@@ -62,6 +62,7 @@ async function searchAuthor() {
           // Set HTML element values
           img = document.createElement("img");
           div = document.createElement("div");
+          div.style.display = "inline-block";
           img.id = isbn[j].identifier;
           img.src = src;
 
@@ -75,6 +76,8 @@ async function searchAuthor() {
             document
               .getElementById(isbn[j].identifier.toString())
               .append(books.items[book].volumeInfo.title);
+
+            document.getElementById(isbn[j].identifier.toString());
           }
         }
       }
@@ -84,8 +87,8 @@ async function searchAuthor() {
   // Remove any "falsy" ISBNs
   filtered_isbns = isbns.filter(Boolean);
 
-  spinner.removeAttribute('hidden');
-  
+  spinner.removeAttribute("hidden");
+
   // Pseudo-concurrently retrieve all potential authors mentioned in the book description
   await Promise.allSettled(
     filtered_isbns.map((stuff) => getMentionedAuthors(stuff))
@@ -93,20 +96,15 @@ async function searchAuthor() {
 
   addAuthors();
 
-  spinner.setAttribute('hidden', '');
+  spinner.setAttribute("hidden", "");
 }
 
 async function getMentionedAuthors(isbn) {
-  
-
-  const response = await fetch(
-    "https://api.matthewsechrist.cloud/book",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: '{"book":"' + isbn + '"}',
-    }
-  ).then((response) => response.json());
+  const response = await fetch("https://api.matthewsechrist.cloud/book", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: '{"book":"' + isbn + '"}',
+  }).then((response) => response.json());
 
   //spinner.setAttribute('hidden', '');
 
@@ -133,14 +131,19 @@ input.addEventListener("keyup", function (event) {
 // This function adds the authors to HTML in order of number of books associated by author in descending order,
 // mimicking a sort by relevancy
 function addAuthors() {
-
-   div = document.createElement("div");
+  div = document.createElement("div");
 
   // Step 1 of 3 - Flatten multiple author arrays into one authors array
   flattened_authors = authors.flat();
 
   // Step 2 of 3 - Remove "falsy" authors from the flattened_authors array
   filtered_authors = flattened_authors.filter(Boolean);
+
+  for (var i = filtered_authors.length - 1; i >= 0; --i) {
+    if(filtered_authors[i].books === 0) {
+      filtered_authors.splice(i, 1);
+    }
+}
 
   // Step 3 of 5 - Need to remove currently searched author name from the array
 
@@ -161,19 +164,9 @@ function addAuthors() {
 
   // Only add the authors HTML div only after an author has been searched
   if (searched_author) {
-    
-
-    
-
-    document
-      .getElementById("associated_authors")      
-      .append("Here are the mentioned authors:");
-
+    document.getElementById("associated_authors").append("MENTIONED AUTHORS:");
 
     for (author_index in ordered_authors) {
-      author_div = document.createElement("div");
-
-
       // Remove the currently searched author, no need to see duplicates
       if (
         ordered_authors[author_index][0].toLowerCase() ==
@@ -182,22 +175,93 @@ function addAuthors() {
         ordered_authors.splice(author_index, 1);
       }
 
-      author_div.setAttribute("id", "author"+author_index.toString());
+      associated_author_div = document.createElement("div");
 
-      document.getElementById("associated_authors").appendChild(author_div);
+      associated_author_div.append(
+        //call getFirst10Books per author
+
+        //getFirst10Books(ordered_authors[author_index][0]);
+        ordered_authors[author_index][0] +
+          " has " +
+          ordered_authors[author_index][1].toString() +
+          " associated books."
+      );
 
       document
-      .getElementById("author"+author_index.toString())
-      .append(ordered_authors[author_index][0] +
-        " has " +
-        ordered_authors[author_index][1].toString() +
-        " associated books.");
- 
+        .getElementById("associated_authors")
+        .appendChild(associated_author_div);
     }
   }
 }
 
 searchAuthor();
 
+async function getFirst10Books(fetched_author) {
+  //promise all setlled for first 10 books - title and image
+  //append to that specific authors div
 
+  let authors_books = await fetch(
+    'https://www.googleapis.com/books/v1/volumes?q=inauthor:${"' +
+      fetched_author +
+      '"}&maxResults=10'
+  ).then((response) => response.json());
 
+  this.authors_books = authors_books;
+
+  author_div = document.createElement("div");
+  fetched_author_div = document.createElement("div");
+  author_div.style.display = "block";
+  fetched_author_div.style.display = "block";
+
+  author_div.setAttribute("id", fetched_author.replace(/\s+/g, ""));
+
+  fetched_author_div.append(fetched_author);
+
+  document.getElementById("associated_authors").appendChild(author_div);
+  //document.getElementById(author_div).appendChild(fetched_author_div);
+
+  for (var book in authors_books.items) {
+    isbn = authors_books.items[book].volumeInfo.industryIdentifiers;
+
+    for (var j = 0; j < isbn.length; j++) {
+      if (
+        isbn[j].type === "ISBN_10" &&
+        authors_books.items[book].volumeInfo.description
+      ) {
+        isbns.push(isbn[j].identifier);
+
+        // Need to change from HTTP to HTTPS for the Google Books image link
+        if (authors_books.items[book].volumeInfo.imageLinks) {
+          var src = authors_books.items[
+            book
+          ].volumeInfo.imageLinks.thumbnail.replace("http://", "https://");
+        }
+
+        // Set HTML element values
+        img = document.createElement("img");
+        div = document.createElement("div");
+        title_div = document.createElement("div");
+        title_div.style.display = "block";
+        div.style.display = "inline-block";
+        img.id = isbn[j].identifier;
+        img.src = src;
+
+        div.setAttribute("id", isbn[j].identifier.toString());
+
+        title_div.append(authors_books.items[book].volumeInfo.title);
+
+        // Add HTML elements
+        document
+          .getElementById(fetched_author.replace(/\s+/g, ""))
+          .appendChild(div);
+        document.getElementById(isbn[j].identifier.toString()).append(img);
+
+        if (authors_books.items[book].volumeInfo.title) {
+          document
+            .getElementById(isbn[j].identifier.toString())
+            .appendChild(title_div);
+        }
+      }
+    }
+  }
+}
