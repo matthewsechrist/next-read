@@ -1,31 +1,47 @@
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/nextread.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/nextread.css" />
 </head>
 
 <html>
   <body>
-    <div class="title">
-    NextRead</div>
+    <div class="title">NextRead</div>
     <div class="header">
       Welcome to NextRead! 📚
-    <br>
-    You search for your favorite author, NextRead scans their books for all 
-    author endorsements and mentions for your next potential favorite author!
-  </div>
-  
+      <br />
+      What you do: You search for your favorite author, NextRead scans their
+      books for all author endorsements and mentions for your next potential
+      favorite author! How it works: You search for an author, NextRead scan
+      their first 10 book results from Google Books, scans their book
+      descriptions, and returns all author's names found
+    </div>
+
     <input type="search" id="search" />
     <button onclick="searchAuthor()" type="button" name="button">
-      Click Me!
+      Search an author!
     </button>
-   
-    
+
     <div id="associated_authors"></div>
     <div id="spinner"></div>
-     <div id="current_author"></div>
+    <div id="current_author"></div>
     <div id="content"></div>
+    <script>var acc = document.getElementsByClassName("accordion");
+      var i;
+      
+      for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+          this.classList.toggle("active");
+          var panel = this.nextElementSibling;
+          if (panel.style.maxHeight) {
+            panel.style.maxHeight = null;
+          } else {
+            panel.style.maxHeight = panel.scrollHeight + "px";
+          } 
+        });
+      }
+      </script>
 
     <div class="footer">
       <script type="text/javascript" src="assets\js\books.js"></script>

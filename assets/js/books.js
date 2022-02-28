@@ -1,29 +1,22 @@
-var authors =
-    (isbns =
-    flattened_authors =
-    filtered_authors =
-    ordered_authors =
-      []),
-  dictionary_authors = {},
+var authors = (isbns = flattened_authors = filtered_authors = []),
   isbn = (searched_author = "");
+var map_of_authors = {};
 
 const spinner = document.getElementById("spinner");
 
-//const spinner = document.getElementById("associated_authors");
-
 async function searchAuthor() {
-  // Set searched_author variable to searched valued
+  // Set searched_author variable to HTML search value
   searched_author = document.getElementById("search").value;
 
+  // Reset all author varables and Null out  with each author search
   (authors = []), (isbns = []);
 
-  // Null out HTML elements for book content and authors
   document.getElementById("content").innerHTML =
     document.getElementById("associated_authors").innerHTML =
     document.getElementById("current_author").innerHTML =
       "";
 
-  // If a valid author is searched, pull the first 10 books for the searched author
+  // If a valid author is searched, display the first 10 books for the searched author
   if (searched_author) {
     document
       .getElementById("current_author")
@@ -68,7 +61,7 @@ async function searchAuthor() {
 
           div.setAttribute("id", isbn[j].identifier.toString());
 
-          // Add HTML elements
+          // Add each book's image and title ina div appended to the content div
           document.getElementById("content").appendChild(div);
           document.getElementById(isbn[j].identifier.toString()).append(img);
 
@@ -84,12 +77,14 @@ async function searchAuthor() {
     }
   }
 
-  // Remove any "falsy" ISBNs
+  // Remove any "falsy" ISBNs, including [], None, Null, false
   filtered_isbns = isbns.filter(Boolean);
 
   spinner.removeAttribute("hidden");
 
   // Pseudo-concurrently retrieve all potential authors mentioned in the book description
+  // Using Promise.allSettled as opposed to Promise.all since I want to show as many potential
+  // authors as possible, even if I can't return all of them
   await Promise.allSettled(
     filtered_isbns.map((stuff) => getMentionedAuthors(stuff))
   );
@@ -99,6 +94,8 @@ async function searchAuthor() {
   spinner.setAttribute("hidden", "");
 }
 
+// This function passes in an ISBN, calls my API and returns all authors which are
+// assigned to the authors array
 async function getMentionedAuthors(isbn) {
   const response = await fetch("https://api.matthewsechrist.cloud/book", {
     method: "POST",
@@ -111,14 +108,9 @@ async function getMentionedAuthors(isbn) {
   this.response = response;
 
   authors.push(response);
-  if (books.items[book].volumeInfo.title) {
-    document
-      .getElementById(isbn.toString())
-      .append(books.items[book].volumeInfo.title);
-  }
 }
 
-// Call the searchAuthor() function from the Enter key, also the "Click Me!" button
+// Call the searchAuthor() function from the Enter key, also the search button
 var input = document.getElementById("search");
 input.addEventListener("keyup", function (event) {
   if (event.key === "Enter") {
@@ -133,31 +125,31 @@ input.addEventListener("keyup", function (event) {
 function addAuthors() {
   div = document.createElement("div");
 
-  // Step 1 of 3 - Flatten multiple author arrays into one authors array
+  // Step 1 of 3 - Flatten multiple author array results into one flat authors array
   flattened_authors = authors.flat();
 
-  // Step 2 of 3 - Remove "falsy" authors from the flattened_authors array
+  // Step 2 of 3 - Remove "false-ish" authors from the flattened_authors array
   filtered_authors = flattened_authors.filter(Boolean);
 
+  //Step 3 of 5 - Remove authors with 0 books
   for (var i = filtered_authors.length - 1; i >= 0; --i) {
-    if(filtered_authors[i].books === 0) {
+    if (filtered_authors[i].books === 0) {
       filtered_authors.splice(i, 1);
     }
-}
+  }
 
-  // Step 3 of 5 - Need to remove currently searched author name from the array
-
-  // Step 4 of 5 - Create a dictionary of authors which does not allow duplicates of authors,
+  // Step 4 of 5 - Create a map of authors which does not allow duplicates of authors,
   // and this maps the JSON returned in the format author:books
-  dictionary_authors = Object.assign(
+  map_of_authors = Object.assign(
     {},
     ...filtered_authors.map((x) => ({ [x.author]: x.books }))
   );
 
-  // Step 5 of 5 - Create and sort the ordered_authors array in descending order, mimicking relevancy of authors found
-  var ordered_authors = Object.keys(dictionary_authors).map(function (key) {
-    return [key, dictionary_authors[key]];
+  // Step 5 of 5 - Create and sort the ordered_authors array in descending order, showing most prolific authors in top
+  var ordered_authors = Object.keys(map_of_authors).map(function (key) {
+    return [key, map_of_authors[key]];
   });
+
   ordered_authors.sort(function (first, second) {
     return second[1] - first[1];
   });
@@ -167,7 +159,7 @@ function addAuthors() {
     document.getElementById("associated_authors").append("MENTIONED AUTHORS:");
 
     for (author_index in ordered_authors) {
-      // Remove the currently searched author, no need to see duplicates
+      // Remove the currently searched author
       if (
         ordered_authors[author_index][0].toLowerCase() ==
         searched_author.toLowerCase()
@@ -177,28 +169,24 @@ function addAuthors() {
 
       associated_author_div = document.createElement("div");
 
-      associated_author_div.append(
-        //call getFirst10Books per author
+      
+        getFirst10Books(ordered_authors[author_index][0]);
+        // associated_author_div.append(
+        // ordered_authors[author_index][0] +
+          // " has " +
+          // ordered_authors[author_index][1].toString() +
+          // " associated books."
+      // );
 
-        //getFirst10Books(ordered_authors[author_index][0]);
-        ordered_authors[author_index][0] +
-          " has " +
-          ordered_authors[author_index][1].toString() +
-          " associated books."
-      );
-
-      document
-        .getElementById("associated_authors")
-        .appendChild(associated_author_div);
+    //  document
+    //    .getElementById("associated_authors")
+    //    .appendChild(associated_author_div);
     }
   }
 }
 
-searchAuthor();
-
+// This functions add up to the first 10 books return for each mentioned author
 async function getFirst10Books(fetched_author) {
-  //promise all setlled for first 10 books - title and image
-  //append to that specific authors div
 
   let authors_books = await fetch(
     'https://www.googleapis.com/books/v1/volumes?q=inauthor:${"' +
@@ -210,6 +198,7 @@ async function getFirst10Books(fetched_author) {
 
   author_div = document.createElement("div");
   fetched_author_div = document.createElement("div");
+
   author_div.style.display = "block";
   fetched_author_div.style.display = "block";
 
@@ -218,6 +207,8 @@ async function getFirst10Books(fetched_author) {
   fetched_author_div.append(fetched_author);
 
   document.getElementById("associated_authors").appendChild(author_div);
+  document.getElementById("associated_authors").className = "accordion";
+
   //document.getElementById(author_div).appendChild(fetched_author_div);
 
   for (var book in authors_books.items) {
@@ -250,6 +241,8 @@ async function getFirst10Books(fetched_author) {
 
         title_div.append(authors_books.items[book].volumeInfo.title);
 
+        document.getElementById(fetched_author.replace(/\s+/g, "")).className = "panel";
+
         // Add HTML elements
         document
           .getElementById(fetched_author.replace(/\s+/g, ""))
@@ -261,7 +254,15 @@ async function getFirst10Books(fetched_author) {
             .getElementById(isbn[j].identifier.toString())
             .appendChild(title_div);
         }
+
       }
     }
   }
 }
+
+
+searchAuthor();
+
+//associated_author
+// button for each author name
+// append titles and images
