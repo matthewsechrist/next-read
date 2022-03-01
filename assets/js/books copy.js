@@ -91,8 +91,6 @@ async function searchAuthor() {
 
   addAuthors();
 
-
-
   spinner.setAttribute("hidden", "");
 }
 
@@ -168,13 +166,17 @@ function addAuthors() {
       ) {
         ordered_authors.splice(author_index, 1);
       }
+console.log(ordered_authors);
+
       getFirst10Books(ordered_authors[author_index][0]);
-    } 
+    }
   }
 }
 
 // This functions add up to the first 10 books return for each mentioned author
 async function getFirst10Books(fetched_author) {
+
+
   let authors_books = await fetch(
     'https://www.googleapis.com/books/v1/volumes?q=inauthor:${"' +
       fetched_author +
@@ -184,53 +186,14 @@ async function getFirst10Books(fetched_author) {
   this.authors_books = authors_books;
 
   author_div = document.createElement("div");
+  fetched_author_div = document.createElement("div");
 
-  author_button = document.createElement("button");
-  author_button.setAttribute("id", fetched_author.replace(/\s+/g, "")+"_button");
-  author_button.className = "accordion";
-
-  
-
-
-
-  author_p= document.createElement("p");
-  author_p.setAttribute("id", fetched_author.replace(/\s+/g, "")+"_p");
-
-  author_button.textContent = fetched_author.replace(/\s+/g, "");
-  //document.getElementById(fetched_author.replace(/\s+/g, "")+"_button").className = "accordion";
-
-  document
-  .getElementById("associated_authors")
-  .appendChild(author_button);
-
-  document.getElementById("associated_authors").appendChild(author_div);
-
+  author_div.style.display = "block";
+  fetched_author_div.style.display = "block";
 
   author_div.setAttribute("id", fetched_author.replace(/\s+/g, ""));
-  author_div.className = "panel";
-
-  document
-  .getElementById(fetched_author.replace(/\s+/g, ""))
-  .appendChild(author_p);
-
-  //var acc = document.getElementsByClassName("accordion");
-  //var i;
-  
-  //for (i = 0; i < acc.length; i++) {
-    //acc[i].addEventListener("click", function() {
-      author_button.addEventListener("click", function() {
-      this.classList.toggle("active");
-      var panel = this.nextElementSibling;
-      if (panel.style.maxHeight) {
-        panel.style.maxHeight = null;
-      } else {
-        panel.style.maxHeight = panel.scrollHeight + "px";
-      } 
-    }
-    );
-  
-
-
+  document.getElementById("associated_authors").appendChild(author_div);
+  document.getElementById(fetched_author.replace(/\s+/g, "")).append(fetched_author.replace(/\s+/g, ""));
 
 
   for (var book in authors_books.items) {
@@ -239,22 +202,55 @@ async function getFirst10Books(fetched_author) {
 
       for (j in isbn) {
         if (
-          isbn[j].type === "ISBN_10"
+          isbn[j].type === "ISBN_10" &&
+          authors_books.items[book].volumeInfo.description
         ) {
           isbns.push(isbn[j].identifier);
 
-          var text = document.createTextNode(authors_books.items[book].volumeInfo.title);
+          // Need to change from HTTP to HTTPS for the Google Books image link
+          if (authors_books.items[book].volumeInfo.imageLinks) {
+            var src = authors_books.items[
+              book
+            ].volumeInfo.imageLinks.thumbnail.replace("http://", "https://");
+          }
+          else var src = "";
+          
 
-        document
-        .getElementById(fetched_author.replace(/\s+/g, "")+"_p")
-        .append(authors_books.items[book].volumeInfo.title);
+          // Set HTML element values
+          author_button = document.createElement("button");
+          img = document.createElement("img");
+          div = document.createElement("div");
+          title_div = document.createElement("div");
+          title_div.style.display = "block";
+          div.style.display = "inline-block";
+          img.id = isbn[j].identifier;
+          img.src = src;
+
+          div.setAttribute("id", isbn[j].identifier.toString());
+
+          title_div.append(authors_books.items[book].volumeInfo.title);
+
+          author_button.text_content = fetched_author.replace(/\s+/g, "");
+
+          // Add HTML elements
+          document
+            .getElementById(fetched_author.replace(/\s+/g, ""))
+            .appendChild(div);
+
+            if(authors_books.items[book].volumeInfo.imageLinks){
+          document.getElementById(isbn[j].identifier.toString()).append(img);
+            }
+            else document.getElementById(isbn[j].identifier.toString()).append("No image found");
+
+          if (authors_books.items[book].volumeInfo.title) {
+            document
+              .getElementById(isbn[j].identifier.toString())
+              .appendChild(title_div);
+          }
         }
       }
     }
   }
-
 }
-
-
 
 searchAuthor();
