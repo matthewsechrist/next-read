@@ -86,12 +86,10 @@ async function searchAuthor() {
   // Using Promise.allSettled as opposed to Promise.all since I want to show as many potential
   // authors as possible, even if I can't return all of them
   await Promise.allSettled(
-    filtered_isbns.map((stuff) => getMentionedAuthors(stuff))
+    filtered_isbns.map((author) => getMentionedAuthors(author))
   );
 
   addAuthors();
-
-
 
   spinner.setAttribute("hidden", "");
 }
@@ -106,8 +104,6 @@ async function getMentionedAuthors(isbn) {
   }).then((response) => response.json());
 
   //spinner.setAttribute('hidden', '');
-
-  this.response = response;
 
   authors.push(response);
 }
@@ -125,7 +121,6 @@ input.addEventListener("keyup", function (event) {
 // This function adds the authors to HTML in order of number of books associated by author in descending order,
 // mimicking a sort by relevancy
 function addAuthors() {
-  //div = document.createElement("div");
 
   // Step 1 of 3 - Flatten multiple author array results into one flat authors array
   flattened_authors = authors.flat();
@@ -139,6 +134,8 @@ function addAuthors() {
       filtered_authors.splice(i, 1);
     }
   }
+
+
 
   // Step 4 of 5 - Create a map of authors which does not allow duplicates of authors,
   // and this maps the JSON returned in the format author:books
@@ -156,6 +153,8 @@ function addAuthors() {
     return second[1] - first[1];
   });
 
+  console.log(ordered_authors);
+
   // Only add the authors HTML div only after an author has been searched
   if (searched_author) {
     document.getElementById("associated_authors").append("MENTIONED AUTHORS:");
@@ -168,8 +167,10 @@ function addAuthors() {
       ) {
         ordered_authors.splice(author_index, 1);
       }
+
+      
       getFirst10Books(ordered_authors[author_index][0]);
-    } 
+    }
   }
 }
 
@@ -184,77 +185,53 @@ async function getFirst10Books(fetched_author) {
   this.authors_books = authors_books;
 
   author_div = document.createElement("div");
-
+  author_p = document.createElement("p");
   author_button = document.createElement("button");
-  author_button.setAttribute("id", fetched_author.replace(/\s+/g, "")+"_button");
+
   author_button.className = "accordion";
-
-  
-
-
-
-  author_p= document.createElement("p");
-  author_p.setAttribute("id", fetched_author.replace(/\s+/g, "")+"_p");
-
-  author_button.textContent = fetched_author.replace(/\s+/g, "");
-  //document.getElementById(fetched_author.replace(/\s+/g, "")+"_button").className = "accordion";
-
-  document
-  .getElementById("associated_authors")
-  .appendChild(author_button);
-
-  document.getElementById("associated_authors").appendChild(author_div);
-
-
-  author_div.setAttribute("id", fetched_author.replace(/\s+/g, ""));
   author_div.className = "panel";
 
+  author_button.textContent = fetched_author.replace(/\s+/g, "");
+
+  author_button.setAttribute(
+    "id",
+    fetched_author.replace(/\s+/g, "") + "_button"
+  );
+  author_p.setAttribute("id", fetched_author.replace(/\s+/g, "") + "_p");
+  author_div.setAttribute("id", fetched_author.replace(/\s+/g, ""));
+
+  document.getElementById("associated_authors").appendChild(author_button);
+  document.getElementById("associated_authors").appendChild(author_div);
+
   document
-  .getElementById(fetched_author.replace(/\s+/g, ""))
-  .appendChild(author_p);
+    .getElementById(fetched_author.replace(/\s+/g, ""))
+    .appendChild(author_p);
 
-  //var acc = document.getElementsByClassName("accordion");
-  //var i;
-  
-  //for (i = 0; i < acc.length; i++) {
-    //acc[i].addEventListener("click", function() {
-      author_button.addEventListener("click", function() {
-      this.classList.toggle("active");
-      var panel = this.nextElementSibling;
-      if (panel.style.maxHeight) {
-        panel.style.maxHeight = null;
-      } else {
-        panel.style.maxHeight = panel.scrollHeight + "px";
-      } 
+  author_button.addEventListener("click", function () {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
     }
-    );
-  
-
-
-
+  });
 
   for (var book in authors_books.items) {
     if (authors_books.items[book].volumeInfo.industryIdentifiers) {
       isbn = authors_books.items[book].volumeInfo.industryIdentifiers;
 
       for (j in isbn) {
-        if (
-          isbn[j].type === "ISBN_10"
-        ) {
+        if (isbn[j].type === "ISBN_10") {
           isbns.push(isbn[j].identifier);
 
-          var text = document.createTextNode(authors_books.items[book].volumeInfo.title);
-
-        document
-        .getElementById(fetched_author.replace(/\s+/g, "")+"_p")
-        .append(authors_books.items[book].volumeInfo.title);
+          document
+            .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
+            .append(authors_books.items[book].volumeInfo.title);
         }
       }
     }
   }
-
 }
-
-
 
 searchAuthor();

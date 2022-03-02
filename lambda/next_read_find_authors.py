@@ -16,11 +16,20 @@ def next_read_find_authors(event, context):
 
     # Verifies if the potential author has any books attributed to them
     if (book_data['totalItems'] > 0):
-
+        
+        one_good_book = False
+        
         # Iterate over all books returned
         for index, book in enumerate(book_data['items']):
-            # Verify returned book has authors listed, if not return with 0 books
-            if ("authors" not in book['volumeInfo']):
+            
+            # At least one book in author's books must have an IBSN_10
+            for id in book['volumeInfo']['industryIdentifiers']:
+                if (id['type'] == 'ISBN_10'):
+                    one_good_book = True
+
+            # Verify returned book has authors listed and at least one book
+            # with an ISBN_10 value, otherwise return with 0 books
+            if ("authors" not in book['volumeInfo'] or not one_good_book):
                 return {"author": potential_author, "books": 0}
 
             # Assign authors JSON value to authors variable
