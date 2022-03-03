@@ -21,26 +21,27 @@ def next_read_find_authors(event, context):
         
         # Iterate over all books returned
         for index, book in enumerate(book_data['items']):
-            
-            # At least one book in author's books must have an IBSN_10
-            for id in book['volumeInfo']['industryIdentifiers']:
-                if (id['type'] == 'ISBN_10'):
-                    one_good_book = True
+            if book['volumeInfo']['industryIdentifiers']:
+                # At least one book in author's books must have an IBSN_10
+                for id in book['volumeInfo']['industryIdentifiers']:
+                    if (id['type'] == 'ISBN_10'):
+                        one_good_book = True
+                        # print(book['volumeInfo']['industryIdentifiers']['identifier'])
 
-            # Verify returned book has authors listed and at least one book
-            # with an ISBN_10 value, otherwise return with 0 books
-            if ("authors" not in book['volumeInfo'] or not one_good_book):
-                return {"author": potential_author, "books": 0}
+                # Verify returned book has authors listed and at least one book
+                # with an ISBN_10 value, other return with 0 books
+                if ("authors" not in book['volumeInfo'] or not one_good_book):
+                    return {"author": potential_author, "books": 0}
 
-            # Assign authors JSON value to authors variable
-            authors = book['volumeInfo']['authors']
+                # Assign authors JSON value to authors variable
+                authors = book['volumeInfo']['authors']
 
-            # Iterate over all authors and verify the potential author
-            # passed into the function is an exact match to an author's name returned,
-            # not just a partial substring match. The space is replaced with a plus sign for API call
-            for author_index, author in enumerate(authors):
-                if (potential_author.replace('+', ' ').lower() == author.lower()):
-                    return {"author": author, "books": book_data['totalItems']}
+                # Iterate over all authors and verify the potential author
+                # passed into the function is an exact match to an author's name returned,
+                # not just a partial substring match. The space is replaced with a plus sign for API call
+                for author_index, author in enumerate(authors):
+                    if (potential_author.replace('+', ' ').lower() == author.lower()):
+                        return {"author": author, "books": book_data['totalItems']}
 
     # If the potential author is not an author, return None
     else:

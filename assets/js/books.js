@@ -20,7 +20,7 @@ async function searchAuthor() {
   if (searched_author) {
     document
       .getElementById("current_author")
-      .append("BOOKS BY " + searched_author.toUpperCase());
+      .append("BOOKS BY " + searched_author.toUpperCase() + "USED FOR NEXTREAD PROCESSING");
 
     document.createElement("associated_authors");
 
@@ -86,9 +86,9 @@ async function searchAuthor() {
   // Using Promise.allSettled as opposed to Promise.all since I want to show as many potential
   // authors as possible, even if I can't return all of them
   await Promise.allSettled(
-    filtered_isbns.map((author) => getMentionedAuthors(author))
+      filtered_isbns.map((item) => getMentionedAuthors(item))
   );
-
+console.log(filtered_isbns)
   addAuthors();
 
   spinner.setAttribute("hidden", "");
@@ -104,6 +104,8 @@ async function getMentionedAuthors(isbn) {
   }).then((response) => response.json());
 
   //spinner.setAttribute('hidden', '');
+
+  console.log(isbn)
 
   authors.push(response);
 }
@@ -191,7 +193,7 @@ async function getFirst10Books(fetched_author) {
   author_button.className = "accordion";
   author_div.className = "panel";
 
-  author_button.textContent = fetched_author.replace(/\s+/g, "");
+  author_button.textContent = fetched_author;
 
   author_button.setAttribute(
     "id",
