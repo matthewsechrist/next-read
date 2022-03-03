@@ -20,7 +20,11 @@ async function searchAuthor() {
   if (searched_author) {
     document
       .getElementById("current_author")
-      .append("BOOKS BY " + searched_author.toUpperCase() + "USED FOR NEXTREAD PROCESSING");
+      .append(
+        "BOOKS BY " +
+          searched_author.toUpperCase() +
+          "USED FOR NEXTREAD PROCESSING"
+      );
 
     document.createElement("associated_authors");
 
@@ -86,9 +90,9 @@ async function searchAuthor() {
   // Using Promise.allSettled as opposed to Promise.all since I want to show as many potential
   // authors as possible, even if I can't return all of them
   await Promise.allSettled(
-      filtered_isbns.map((item) => getMentionedAuthors(item))
+    filtered_isbns.map((item) => getMentionedAuthors(item))
   );
-console.log(filtered_isbns)
+
   addAuthors();
 
   spinner.setAttribute("hidden", "");
@@ -104,8 +108,6 @@ async function getMentionedAuthors(isbn) {
   }).then((response) => response.json());
 
   //spinner.setAttribute('hidden', '');
-
-  console.log(isbn)
 
   authors.push(response);
 }
@@ -123,7 +125,6 @@ input.addEventListener("keyup", function (event) {
 // This function adds the authors to HTML in order of number of books associated by author in descending order,
 // mimicking a sort by relevancy
 function addAuthors() {
-
   // Step 1 of 3 - Flatten multiple author array results into one flat authors array
   flattened_authors = authors.flat();
 
@@ -136,8 +137,6 @@ function addAuthors() {
       filtered_authors.splice(i, 1);
     }
   }
-
-
 
   // Step 4 of 5 - Create a map of authors which does not allow duplicates of authors,
   // and this maps the JSON returned in the format author:books
@@ -155,8 +154,6 @@ function addAuthors() {
     return second[1] - first[1];
   });
 
-  console.log(ordered_authors);
-
   // Only add the authors HTML div only after an author has been searched
   if (searched_author) {
     document.getElementById("associated_authors").append("MENTIONED AUTHORS:");
@@ -170,13 +167,12 @@ function addAuthors() {
         ordered_authors.splice(author_index, 1);
       }
 
-      
       getFirst10Books(ordered_authors[author_index][0]);
     }
   }
 }
 
-// This functions add up to the first 10 books return for each mentioned author
+// This functions adds HTML elements for the first 10 books return for each mentioned author
 async function getFirst10Books(fetched_author) {
   let authors_books = await fetch(
     'https://www.googleapis.com/books/v1/volumes?q=inauthor:${"' +
@@ -184,34 +180,34 @@ async function getFirst10Books(fetched_author) {
       '"}&maxResults=10'
   ).then((response) => response.json());
 
-  this.authors_books = authors_books;
-
+  // Create HTML elements
   author_div = document.createElement("div");
   author_p = document.createElement("p");
   author_button = document.createElement("button");
 
+  // Set the class names for the accordion
   author_button.className = "accordion";
   author_div.className = "panel";
 
+  // Set the button text to the fetched author name
   author_button.textContent = fetched_author;
 
-  author_button.setAttribute(
-    "id",
-    fetched_author.replace(/\s+/g, "") + "_button"
-  );
+  // Set the id for each HTML element
+  author_button.setAttribute("id", fetched_author.replace(/\s+/g, "") + "_button");
   author_p.setAttribute("id", fetched_author.replace(/\s+/g, "") + "_p");
   author_div.setAttribute("id", fetched_author.replace(/\s+/g, ""));
 
+  // Adds the author HTML elements to the associate_authors div
   document.getElementById("associated_authors").appendChild(author_button);
   document.getElementById("associated_authors").appendChild(author_div);
+  document.getElementById(fetched_author.replace(/\s+/g, "")).appendChild(author_p);
 
-  document
-    .getElementById(fetched_author.replace(/\s+/g, ""))
-    .appendChild(author_p);
-
+  // This code adds the accordion effect to each author button
   author_button.addEventListener("click", function () {
     this.classList.toggle("active");
+
     var panel = this.nextElementSibling;
+    
     if (panel.style.maxHeight) {
       panel.style.maxHeight = null;
     } else {
@@ -219,6 +215,8 @@ async function getFirst10Books(fetched_author) {
     }
   });
 
+  // Only adds books to the author div that have an associated ISBN_10. Will need to change
+  // this to thumbnails. 
   for (var book in authors_books.items) {
     if (authors_books.items[book].volumeInfo.industryIdentifiers) {
       isbn = authors_books.items[book].volumeInfo.industryIdentifiers;

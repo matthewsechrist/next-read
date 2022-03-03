@@ -34,7 +34,6 @@
   }
 }
 
-
 .accordion {
   background-color: #eee;
   color: #444;
@@ -49,12 +48,13 @@
   text-align: center;
 }
 
-.active, .accordion:hover {
+.active,
+.accordion:hover {
   background-color: #ccc;
 }
 
 .accordion:after {
-  content: '\002B';
+  content: "\002B";
   color: #777;
   font-weight: bold;
   float: right;
