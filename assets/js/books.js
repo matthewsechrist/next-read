@@ -68,14 +68,6 @@ async function searchAuthor() {
           // Add each book's image and title ina div appended to the content div
           document.getElementById("content").appendChild(div);
           document.getElementById(isbn[j].identifier.toString()).append(img);
-
-          if (books.items[book].volumeInfo.title) {
-            document
-              .getElementById(isbn[j].identifier.toString())
-              .append(books.items[book].volumeInfo.title);
-
-            document.getElementById(isbn[j].identifier.toString());
-          }
         }
       }
     }
@@ -90,7 +82,7 @@ async function searchAuthor() {
   // Using Promise.allSettled as opposed to Promise.all since I want to show as many potential
   // authors as possible, even if I can't return all of them
   await Promise.allSettled(
-    filtered_isbns.map((item) => getMentionedAuthors(item))
+    filtered_isbns.map((isbn) => getMentionedAuthors(isbn))
   );
 
   addAuthors();
@@ -156,7 +148,7 @@ function addAuthors() {
 
   // Only add the authors HTML div only after an author has been searched
   if (searched_author) {
-    document.getElementById("associated_authors").append("MENTIONED AUTHORS:");
+    document.getElementById("associated_authors").append("MENTIONED AUTHORS");
 
     for (author_index in ordered_authors) {
       // Remove the currently searched author
@@ -193,21 +185,26 @@ async function getFirst10Books(fetched_author) {
   author_button.textContent = fetched_author;
 
   // Set the id for each HTML element
-  author_button.setAttribute("id", fetched_author.replace(/\s+/g, "") + "_button");
+  author_button.setAttribute(
+    "id",
+    fetched_author.replace(/\s+/g, "") + "_button"
+  );
   author_p.setAttribute("id", fetched_author.replace(/\s+/g, "") + "_p");
   author_div.setAttribute("id", fetched_author.replace(/\s+/g, ""));
 
   // Adds the author HTML elements to the associate_authors div
   document.getElementById("associated_authors").appendChild(author_button);
   document.getElementById("associated_authors").appendChild(author_div);
-  document.getElementById(fetched_author.replace(/\s+/g, "")).appendChild(author_p);
+  document
+    .getElementById(fetched_author.replace(/\s+/g, ""))
+    .appendChild(author_p);
 
   // This code adds the accordion effect to each author button
   author_button.addEventListener("click", function () {
     this.classList.toggle("active");
 
     var panel = this.nextElementSibling;
-    
+
     if (panel.style.maxHeight) {
       panel.style.maxHeight = null;
     } else {
@@ -216,19 +213,43 @@ async function getFirst10Books(fetched_author) {
   });
 
   // Only adds books to the author div that have an associated ISBN_10. Will need to change
-  // this to thumbnails. 
+  // this to thumbnails.
   for (var book in authors_books.items) {
     if (authors_books.items[book].volumeInfo.industryIdentifiers) {
       isbn = authors_books.items[book].volumeInfo.industryIdentifiers;
 
       for (j in isbn) {
         if (isbn[j].type === "ISBN_10") {
-          isbns.push(isbn[j].identifier);
+          if (authors_books.items[book].volumeInfo.imageLinks) {
+            var src = authors_books.items[
+              book
+            ].volumeInfo.imageLinks.thumbnail.replace("http://", "https://");
+          
 
+          // Set HTML element values
+          img = document.createElement("img");
+          div = document.createElement("div");
+          div.style.display = "inline-block";
+          img.id = isbn[j].identifier;
+          img.src = src;
+
+          // Add each book's image and title ina div appended to the content div
+          document
+            .getElementById(fetched_author.replace(/\s+/g, ""))
+            .appendChild(div);
           document
             .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
-            .append(authors_books.items[book].volumeInfo.title);
+            .append(img);
         }
+      else {
+        if (authors_books.items[book].volumeInfo.title){
+        document
+        .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
+        .append(authors_books.items[book].volumeInfo.title + " - No image found");
+        }
+      } 
+      }
+
       }
     }
   }
