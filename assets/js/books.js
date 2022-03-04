@@ -149,17 +149,24 @@ function addAuthors() {
   // Only add the authors HTML div only after an author has been searched
   if (searched_author) {
     document.getElementById("associated_authors").append("MENTIONED AUTHORS");
+    console.log(ordered_authors);
 
     for (author_index in ordered_authors) {
-      // Remove the currently searched author
+     //Remove the currently searched author
       if (
         ordered_authors[author_index][0].toLowerCase() ==
         searched_author.toLowerCase()
       ) {
         ordered_authors.splice(author_index, 1);
       }
+      else {
+        getFirst10Books(ordered_authors[author_index][0]);
+      }
+      console.log(ordered_authors);
+      console.log(author_index);
 
-      getFirst10Books(ordered_authors[author_index][0]);
+      
+       
     }
   }
 }
