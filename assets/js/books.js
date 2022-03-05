@@ -36,40 +36,45 @@ async function searchAuthor() {
 
     this.books = books;
 
-    // Each book results must have a 10 digit ISBN and a book description. An array of ISBNs is created
-    // for further processing in the getMentionedAuthors() function
-    for (var book in books.items) {
-      isbn = books.items[book].volumeInfo.industryIdentifiers;
+    if (books.totalItems > 0) {
+      // Each book results must have a 10 digit ISBN and a book description. An array of ISBNs is created
+      // for further processing in the getMentionedAuthors() function
+      for (var book in books.items) {
+        isbn = books.items[book].volumeInfo.industryIdentifiers;
 
-      for (var j = 0; j < isbn.length; j++) {
-        if (
-          isbn[j].type === "ISBN_10" &&
-          books.items[book].volumeInfo.description
-        ) {
-          isbns.push(isbn[j].identifier);
+        for (var j = 0; j < isbn.length; j++) {
+          if (
+            isbn[j].type === "ISBN_10" &&
+            books.items[book].volumeInfo.description
+          ) {
+            isbns.push(isbn[j].identifier);
 
-          // Need to change from HTTP to HTTPS for the Google Books image link
-          if (books.items[book].volumeInfo.imageLinks) {
-            var src = books.items[book].volumeInfo.imageLinks.thumbnail.replace(
-              "http://",
-              "https://"
-            );
+            // Need to change from HTTP to HTTPS for the Google Books image link
+            if (books.items[book].volumeInfo.imageLinks) {
+              var src = books.items[
+                book
+              ].volumeInfo.imageLinks.thumbnail.replace("http://", "https://");
+            }
+
+            // Set HTML element values
+            img = document.createElement("img");
+            div = document.createElement("div");
+            div.style.display = "inline-block";
+            img.id = isbn[j].identifier;
+            img.src = src;
+
+            div.setAttribute("id", isbn[j].identifier.toString());
+
+            // Add each book's image and title ina div appended to the content div
+            document.getElementById("content").appendChild(div);
+            document.getElementById(isbn[j].identifier.toString()).append(img);
           }
-
-          // Set HTML element values
-          img = document.createElement("img");
-          div = document.createElement("div");
-          div.style.display = "inline-block";
-          img.id = isbn[j].identifier;
-          img.src = src;
-
-          div.setAttribute("id", isbn[j].identifier.toString());
-
-          // Add each book's image and title ina div appended to the content div
-          document.getElementById("content").appendChild(div);
-          document.getElementById(isbn[j].identifier.toString()).append(img);
         }
       }
+    } else {
+      div = document.createElement("div");
+      div.append("No books found");
+      document.getElementById("content").appendChild(div);
     }
   }
 
@@ -114,8 +119,7 @@ input.addEventListener("keyup", function (event) {
   }
 });
 
-// This function adds the authors to HTML in order of number of books associated by author in descending order,
-// mimicking a sort by relevancy
+// This function adds the authors to HTML in order of number of books associated by author
 function addAuthors() {
   // Step 1 of 3 - Flatten multiple author array results into one flat authors array
   flattened_authors = authors.flat();
@@ -152,21 +156,17 @@ function addAuthors() {
     console.log(ordered_authors);
 
     for (author_index in ordered_authors) {
-     //Remove the currently searched author
+      //Remove the currently searched author
       if (
         ordered_authors[author_index][0].toLowerCase() ==
         searched_author.toLowerCase()
       ) {
         ordered_authors.splice(author_index, 1);
-      }
-      else {
+      } else {
         getFirst10Books(ordered_authors[author_index][0]);
       }
       console.log(ordered_authors);
       console.log(author_index);
-
-      
-       
     }
   }
 }
@@ -231,32 +231,32 @@ async function getFirst10Books(fetched_author) {
             var src = authors_books.items[
               book
             ].volumeInfo.imageLinks.thumbnail.replace("http://", "https://");
-          
 
-          // Set HTML element values
-          img = document.createElement("img");
-          div = document.createElement("div");
-          div.style.display = "inline-block";
-          img.id = isbn[j].identifier;
-          img.src = src;
+            // Set HTML element values
+            img = document.createElement("img");
+            div = document.createElement("div");
+            div.style.display = "inline-block";
+            img.id = isbn[j].identifier;
+            img.src = src;
 
-          // Add each book's image and title ina div appended to the content div
-          document
-            .getElementById(fetched_author.replace(/\s+/g, ""))
-            .appendChild(div);
-          document
-            .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
-            .append(img);
+            // Add each book's image and title ina div appended to the content div
+            document
+              .getElementById(fetched_author.replace(/\s+/g, ""))
+              .appendChild(div);
+            document
+              .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
+              .append(img);
+          } else {
+            if (authors_books.items[book].volumeInfo.title) {
+              document
+                .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
+                .append(
+                  authors_books.items[book].volumeInfo.title +
+                    " - No image found"
+                );
+            }
+          }
         }
-      else {
-        if (authors_books.items[book].volumeInfo.title){
-        document
-        .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
-        .append(authors_books.items[book].volumeInfo.title + " - No image found");
-        }
-      } 
-      }
-
       }
     }
   }
