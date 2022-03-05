@@ -14,29 +14,29 @@ async function searchAuthor() {
   document.getElementById("content").innerHTML =
     document.getElementById("associated_authors").innerHTML =
     document.getElementById("current_author").innerHTML =
-      "";
+    "";
 
   // If a valid author is searched, display the first 10 books for the searched author
   if (searched_author) {
-    document
-      .getElementById("current_author")
-      .append(
-        "BOOKS BY " +
-          searched_author.toUpperCase() +
-          "USED FOR NEXTREAD PROCESSING"
-      );
-
-    document.createElement("associated_authors");
-
     let books = await fetch(
       'https://www.googleapis.com/books/v1/volumes?q=inauthor:${"' +
-        searched_author +
-        '"}&maxResults=10'
+      searched_author +
+      '"}&maxResults=10'
     ).then((response) => response.json());
 
     this.books = books;
 
     if (books.totalItems > 0) {
+      document
+        .getElementById("current_author")
+        .append(
+          "BOOKS BY " +
+          searched_author.toUpperCase() +
+          " USED FOR NEXTREAD PROCESSING"
+        );
+
+      document.createElement("associated_authors");
+
       // Each book results must have a 10 digit ISBN and a book description. An array of ISBNs is created
       // for further processing in the getMentionedAuthors() function
       for (var book in books.items) {
@@ -73,9 +73,17 @@ async function searchAuthor() {
       }
     } else {
       div = document.createElement("div");
-      div.append("No books found");
+      div.append("No books found by " + searched_author);
       document.getElementById("content").appendChild(div);
+      //document.getElementById("associated_authors").setAttribute("hidden", "");
+      // document.getElementById("current_author").setAttribute("hidden", "");
     }
+  }
+  else {
+    div = document.createElement("div");
+    div.append("No author found, please try again!");
+    document.getElementById("content").appendChild(div);
+
   }
 
   // Remove any "falsy" ISBNs, including [], None, Null, false
@@ -151,9 +159,10 @@ function addAuthors() {
   });
 
   // Only add the authors HTML div only after an author has been searched
-  if (searched_author) {
-    document.getElementById("associated_authors").append("MENTIONED AUTHORS");
-    console.log(ordered_authors);
+  if (searched_author && ordered_authors.length > 0) {
+    document
+      .getElementById("associated_authors")
+      .append("MENTIONED AUTHORS");
 
     for (author_index in ordered_authors) {
       //Remove the currently searched author
@@ -165,8 +174,6 @@ function addAuthors() {
       } else {
         getFirst10Books(ordered_authors[author_index][0]);
       }
-      console.log(ordered_authors);
-      console.log(author_index);
     }
   }
 }
@@ -175,8 +182,8 @@ function addAuthors() {
 async function getFirst10Books(fetched_author) {
   let authors_books = await fetch(
     'https://www.googleapis.com/books/v1/volumes?q=inauthor:${"' +
-      fetched_author +
-      '"}&maxResults=10'
+    fetched_author +
+    '"}&maxResults=10'
   ).then((response) => response.json());
 
   // Create HTML elements
@@ -252,7 +259,7 @@ async function getFirst10Books(fetched_author) {
                 .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
                 .append(
                   authors_books.items[book].volumeInfo.title +
-                    " - No image found"
+                  " - No image found"
                 );
             }
           }
