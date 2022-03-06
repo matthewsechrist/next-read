@@ -1,3 +1,18 @@
+body {
+  font-family: Lato;
+  background-color: #edede9;
+}
+
+#current_author {
+  font-size: large;
+}
+
+#title {
+  font-family: Cabin;
+  font-size: xx-large;
+  text-align: center;
+}
+
 #spinner:not([hidden]) {
   position: fixed;
   top: 0;
@@ -14,14 +29,18 @@
   width: 80px;
   height: 80px;
   border: 2px solid #f3f3f3;
-  border-top: 3px solid #f25a41;
+  border-top: 2px solid #f25a41;
   border-radius: 100%;
   will-change: transform;
   animation: spin 1s infinite linear;
 }
 
-#associated_authors, #current_author, #content {
+#associated_authors,
+#current_author,
+#content,
+#header {
   text-align: center;
+  align-items: center;
 }
 
 img {
@@ -29,8 +48,9 @@ img {
   width: auto;
 }
 
-#associated_authors{
-min-height: 50%;
+#associated_authors {
+  min-height: 50%;
+  margin: 80px 10px 10px 10px;
 }
 @keyframes spin {
   from {
@@ -42,27 +62,27 @@ min-height: 50%;
 }
 
 .accordion {
-  background-color: #eee;
-  color: #444;
+  background-color: #2d6a4f;
+  color: white;
+  font-weight: bold;
   cursor: pointer;
   padding: 18px;
   width: 100%;
   border: none;
-  text-align: left;
   outline: none;
-  font-size: 15px;
+  font-size: large;
   transition: 0.4s;
   text-align: center;
 }
 
 .active,
 .accordion:hover {
-  background-color: #ccc;
+  background-color: #495057;
 }
 
 .accordion:after {
   content: "\002B";
-  color: #777;
+  color: white;
   font-weight: bold;
   float: right;
   margin-left: 5px;
@@ -78,4 +98,41 @@ min-height: 50%;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Style the search field */
+#search {
+  padding: 10px;
+  font-size: 17px;
+  border: 1px solid grey;
+  float: left;
+  width: 80%;
+  background: #f1f1f1;
+}
+
+/* Style the submit button */
+#author_button {
+  float: left;
+  width: 20%;
+  padding: 10px 10px 10px 10px;
+  background: #2196F3;
+  color: white;
+  font-size: 17px;
+  border-left: none; /* Prevent double borders */
+  cursor: pointer;
+}
+
+#author_button button:hover {
+  background: #0b7dda;
+}
+
+/* Clear floats */
+#author_button::after {
+  content: "";
+  clear: both;
+  display: table;
 }

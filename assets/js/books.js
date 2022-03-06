@@ -30,9 +30,9 @@ async function searchAuthor() {
       document
         .getElementById("current_author")
         .append(
-          "BOOKS BY " +
-          searched_author.toUpperCase() +
-          " USED FOR NEXTREAD PROCESSING"
+          "Books by " +
+          searched_author +
+          " used for NextRead Processing"
         );
 
       document.createElement("associated_authors");
@@ -78,12 +78,6 @@ async function searchAuthor() {
       //document.getElementById("associated_authors").setAttribute("hidden", "");
       // document.getElementById("current_author").setAttribute("hidden", "");
     }
-  }
-  else {
-    div = document.createElement("div");
-    div.append("No author found, please try again!");
-    document.getElementById("content").appendChild(div);
-
   }
 
   // Remove any "falsy" ISBNs, including [], None, Null, false
@@ -162,7 +156,7 @@ function addAuthors() {
   if (searched_author && ordered_authors.length > 0) {
     document
       .getElementById("associated_authors")
-      .append("MENTIONED AUTHORS");
+      .append("Click each mentioned author below to see a few of their books!");
 
     for (author_index in ordered_authors) {
       //Remove the currently searched author

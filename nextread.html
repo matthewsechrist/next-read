@@ -2,29 +2,35 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Cabin" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/nextread.css" />
 </head>
 
 <html>
   <body>
-    <div class="title">NextRead</div>
-    <div class="header">
-      Welcome to NextRead! 📚
-      <br />
-      What you do: You search for your favorite author, NextRead scans their
-      books for all author endorsements and mentions for your next potential
-      favorite author! How it works: You search for an author, NextRead scan
-      their first 10 book results from Google Books, scans their book
-      descriptions, and returns all author's names found
+    
+     <div id="title"> Welcome to NextRead! 📚</div>
+      <div id="header">
+          <br />
+      <b>What you do:</b> Search for your favorite author like <b>Lee Child</b>, NextRead finds 
+       their author endorsements/other mentioned authors!
+      <br /> 
+      <br /> 
+      <b>How it works:</b> You search for an author's name, NextRead scans
+      their first 10 book results from Google Books, searching throgh the book
+      descriptions and returns all author's names found.
+      <br /> <br /> 
     </div>
 
-    <input type="search" id="search" />
-    <button onclick="searchAuthor()" type="button" name="button">
-      Search an author!
+    <input type="search" id="search" placeholder="i.e. Lee Child" />
+    <button onclick="searchAuthor()" type="button" id="author_button">
+      Search
     </button>
 
     <div id="associated_authors"></div>
     <div id="spinner"></div>
+<br>
+<br>
     <div id="current_author"></div>
     <div id="content"></div>
 
