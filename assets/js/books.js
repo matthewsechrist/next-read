@@ -13,9 +13,13 @@ async function searchAuthor() {
 
   document.getElementById("current_author_books").innerHTML =
     document.getElementById("associated_authors").innerHTML =
+    document.getElementById("associated_authors_header").innerHTML =
+
     document.getElementById("current_author").innerHTML =
       "";
       document.getElementById("associated_authors").setAttribute("hidden", "");
+      document.getElementById("associated_authors_header").setAttribute("hidden", "");
+
   
 
   // If a valid author is searched, display the first 10 books for the searched author
@@ -32,7 +36,7 @@ async function searchAuthor() {
       document
         .getElementById("current_author")
         .append(
-          "Books by \"" + searched_author + "\" used for NextRead Processing"
+          "Books by " + searched_author + " used for NextRead Processing"
         );
 
       document.createElement("associated_authors");
@@ -165,9 +169,20 @@ function addAuthors() {
   if (searched_author && ordered_authors.length > 0) {
     document
   .getElementById("associated_authors").removeAttribute("hidden");
+  document
+  .getElementById("associated_authors_header").removeAttribute("hidden");
+
     document
-      .getElementById("associated_authors")
-      .append("Click each mentioned author below to see a few of their books!");
+      .getElementById("associated_authors_header")
+      .append("Click each mentioned author below to see a few of their books.");
+
+      linebreak = document.createElement("br");
+      document
+      .getElementById("associated_authors_header").appendChild(linebreak);
+    
+    document
+      .getElementById("associated_authors_header")
+      .append("Then click a book to see which local library owns it!");
 
     for (author_index in ordered_authors) {
       //Remove the currently searched author
