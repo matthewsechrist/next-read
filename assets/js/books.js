@@ -11,17 +11,19 @@ async function searchAuthor() {
   // Reset all author varables and Null out  with each author search
   (authors = []), (isbns = []);
 
-  document.getElementById("content").innerHTML =
+  document.getElementById("current_author_books").innerHTML =
     document.getElementById("associated_authors").innerHTML =
     document.getElementById("current_author").innerHTML =
-    "";
+      "";
+      document.getElementById("associated_authors").setAttribute("hidden", "");
+  
 
   // If a valid author is searched, display the first 10 books for the searched author
   if (searched_author) {
     let books = await fetch(
       'https://www.googleapis.com/books/v1/volumes?q=inauthor:${"' +
-      searched_author +
-      '"}&maxResults=10'
+        searched_author +
+        '"}&maxResults=10'
     ).then((response) => response.json());
 
     this.books = books;
@@ -30,9 +32,7 @@ async function searchAuthor() {
       document
         .getElementById("current_author")
         .append(
-          "Books by " +
-          searched_author +
-          " used for NextRead Processing"
+          "Books by " + searched_author + " used for NextRead Processing"
         );
 
       document.createElement("associated_authors");
@@ -66,7 +66,7 @@ async function searchAuthor() {
             div.setAttribute("id", isbn[j].identifier.toString());
 
             // Add each book's image and title ina div appended to the content div
-            document.getElementById("content").appendChild(div);
+            document.getElementById("current_author_books").appendChild(div);
             document.getElementById(isbn[j].identifier.toString()).append(img);
           }
         }
@@ -74,9 +74,9 @@ async function searchAuthor() {
     } else {
       div = document.createElement("div");
       div.append("No books found by " + searched_author);
-      document.getElementById("content").appendChild(div);
-      //document.getElementById("associated_authors").setAttribute("hidden", "");
-      // document.getElementById("current_author").setAttribute("hidden", "");
+      document.getElementById("current_author_books").appendChild(div);
+      document.getElementById("associated_authors").setAttribute("hidden", "");
+      document.getElementById("current_author").setAttribute("hidden", "");
     }
   }
 
@@ -155,6 +155,8 @@ function addAuthors() {
   // Only add the authors HTML div only after an author has been searched
   if (searched_author && ordered_authors.length > 0) {
     document
+  .getElementById("associated_authors").removeAttribute("hidden");
+    document
       .getElementById("associated_authors")
       .append("Click each mentioned author below to see a few of their books!");
 
@@ -176,8 +178,8 @@ function addAuthors() {
 async function getFirst10Books(fetched_author) {
   let authors_books = await fetch(
     'https://www.googleapis.com/books/v1/volumes?q=inauthor:${"' +
-    fetched_author +
-    '"}&maxResults=10'
+      fetched_author +
+      '"}&maxResults=10'
   ).then((response) => response.json());
 
   // Create HTML elements
@@ -253,7 +255,7 @@ async function getFirst10Books(fetched_author) {
                 .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
                 .append(
                   authors_books.items[book].volumeInfo.title +
-                  " - No image found"
+                    " - No image found"
                 );
             }
           }

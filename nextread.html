@@ -1,6 +1,6 @@
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css?family=Cabin" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/nextread.css" />
@@ -8,31 +8,31 @@
 
 <html>
   <body>
-    
-     <div id="title"> Welcome to NextRead! 📚</div>
-      <div id="header">
-          <br />
-      <b>What you do:</b> Search for your favorite author like <b>Steve Cavanagh</b>, NextRead finds 
-       their author endorsements/other mentioned authors!
-      <br /> 
-      <br /> 
-      <b>How it works:</b> You search for an author's name, NextRead scans
-      their first 10 book results from Google Books, searching throgh the book
-      descriptions and returns all author's names found.
-      <br /> <br /> 
+    <div id="title">NextRead 📚</div>
+    <div id="header">
+      <br />
+      <b style ="color:#84cc16">What you do:</b> Search for your favorite author, NextRead finds their
+      author endorsements/other mentioned authors!
+      <br />
+      <br />
+      <b style ="color:#84cc16">How it works:</b> NextRead scans the searched author's 
+      first 10 book results from Google Books, scanning through the book
+      description and returns any mentioned authors. <br />
+      <br />
     </div>
 
-    <input type="search" id="search" placeholder="i.e. Steve Cavanagh" />
-    <button onclick="searchAuthor()" type="button" id="search_button">
-      Search
-    </button>
+    <div id="search_box_div"><input type="search" id="search" placeholder="i.e. Steve Cavanagh" />
+    <button onclick="searchAuthor()" type="button" id="search_button">  Search
+    </button></div>
+    
+    
 
     <div id="associated_authors"></div>
     <div id="spinner"></div>
-<br>
-<br>
+    <br />
+    <br />
     <div id="current_author"></div>
-    <div id="content"></div>
+    <div id="current_author_books"></div>
 
     <div class="footer">
       <script type="text/javascript" src="assets\js\books.js"></script>
