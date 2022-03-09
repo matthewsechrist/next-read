@@ -6,7 +6,7 @@
 
 body {
   font-family: Lato;
-  background-color: #CBD5E1;
+  background-color: #cbd5e1;
   color: #27272a;
 }
 
@@ -26,7 +26,8 @@ body {
 }
 
 #title,
-#header,  #current_author_books {
+#header,
+#current_author_books {
   background-color: #27272a;
 }
 
@@ -43,7 +44,7 @@ body {
 
 ::placeholder {
   /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: #A1A1AA;
+  color: #a1a1aa;
   opacity: 1; /* Firefox */
 }
 
@@ -70,12 +71,23 @@ img {
   height: 200px;
   width: auto;
   padding: 10px;
+  filter: drop-shadow(5px 5px 3px black);
+  -webkit-transform: translateZ(0);
+}
+
+/* .shadow {
+  position: relative;
+  -webkit-transform: translateZ(0);
+} */
+
+img:hover{
+  transform: scale(1.05);
+  cursor: pointer;
 }
 
 #associated_authors {
   min-height: 50%;
   margin: 80px 10px 10px 10px;
-
 }
 @keyframes spin {
   from {
@@ -87,7 +99,7 @@ img {
 }
 
 .accordion {
-  background-color: #3CB35A;
+  background-color: #3cb35a;
   color: #f3f3f3;
   font-weight: bold;
   cursor: pointer;
@@ -106,6 +118,7 @@ img {
 .active,
 .accordion:hover {
   background-color: #495057;
+
 }
 
 .accordion:after {
@@ -114,12 +127,11 @@ img {
   font-weight: bold;
   float: right;
   margin-left: 5px;
+
 }
 
 .active:after {
   content: "\2212";
-
-
 }
 
 .panel {
@@ -129,7 +141,7 @@ img {
   overflow: hidden;
   transition: max-height 0.2s ease-out;
   border-radius: 0px 0px 5px 5px;
-
+  z-index: 100;
 }
 
 /* Style the search field */
@@ -142,8 +154,6 @@ img {
   font-size: 17px;
 }
 
-
-
 #search_box_div {
   margin-top: 10px;
 }
@@ -155,16 +165,15 @@ img {
   color: #27272a;
   border: 1px solid #27272a;
   border-color: white;
-
 }
 
 #search_button {
   border-radius: 5px;
   width: 20%;
   color: #f5f5f5;
-  background-color: #3B82F6;
+  background-color: #3b82f6;
   margin-top: 5px;
-  border: 1px solid #3B82F6;
+  border: 1px solid #3b82f6;
 }
 
 #search:hover,

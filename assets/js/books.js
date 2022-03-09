@@ -32,10 +32,12 @@ async function searchAuthor() {
       document
         .getElementById("current_author")
         .append(
-          "Books by " + searched_author + " used for NextRead Processing"
+          "Books by \"" + searched_author + "\" used for NextRead Processing"
         );
 
       document.createElement("associated_authors");
+
+      var p = document.createElement("p");
 
       // Each book results must have a 10 digit ISBN and a book description. An array of ISBNs is created
       // for further processing in the getMentionedAuthors() function
@@ -58,16 +60,22 @@ async function searchAuthor() {
 
             // Set HTML element values
             img = document.createElement("img");
+            a = document.createElement("a");
             div = document.createElement("div");
             div.style.display = "inline-block";
             img.id = isbn[j].identifier;
             img.src = src;
+            href = "https://www.worldcat.org/isbn/"+isbn[j].identifier;
+
+            a.href = href;
+            a.target='_blank';
+            a.appendChild(img);
 
             div.setAttribute("id", isbn[j].identifier.toString());
 
             // Add each book's image and title ina div appended to the content div
             document.getElementById("current_author_books").appendChild(div);
-            document.getElementById(isbn[j].identifier.toString()).append(img);
+            document.getElementById(isbn[j].identifier.toString()).append(a);
           }
         }
       }
@@ -93,6 +101,7 @@ async function searchAuthor() {
   );
 
   addAuthors();
+  document.getElementById("associated_authors").scrollIntoView({ behavior: 'smooth', block: 'center' });
 
   spinner.setAttribute("hidden", "");
 }
@@ -237,10 +246,16 @@ async function getFirst10Books(fetched_author) {
 
             // Set HTML element values
             img = document.createElement("img");
+            a = document.createElement("a");
             div = document.createElement("div");
             div.style.display = "inline-block";
             img.id = isbn[j].identifier;
             img.src = src;
+            href = "https://www.worldcat.org/isbn/"+isbn[j].identifier;
+console.log(isbn[j])
+            a.href = href;
+            a.target='_blank';
+            a.appendChild(img);
 
             // Add each book's image and title ina div appended to the content div
             document
@@ -248,14 +263,14 @@ async function getFirst10Books(fetched_author) {
               .appendChild(div);
             document
               .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
-              .append(img);
+              .append(a);
           } else {
             if (authors_books.items[book].volumeInfo.title) {
               document
                 .getElementById(fetched_author.replace(/\s+/g, "") + "_p")
                 .append(
                   authors_books.items[book].volumeInfo.title +
-                    " - No image found"
+                    " - No image found  "
                 );
             }
           }
