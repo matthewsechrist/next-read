@@ -10,11 +10,14 @@ body {
   color: #27272a;
 }
 
-#current_author, #associated_authors_header {
+#current_author,
+#associated_authors_header {
   font-size: x-large;
   font-weight: bold;
 }
-#header {
+
+header,
+footer {
   color: #f5f5f5;
   font-size: large;
 }
@@ -23,13 +26,17 @@ body {
   font-family: Outfit, sans-serif;
   font-size: xx-large;
   text-align: center;
-  color: #84cc16;
+  color: f5f5f5;
 }
 
 #title,
-#header,
-#current_author_books {
+header,
+footer {
   background-color: #27272a;
+}
+
+#current_author_books {
+  background-color: #f3f3f3;
 }
 
 #spinner:not([hidden]) {
@@ -44,9 +51,8 @@ body {
 }
 
 ::placeholder {
-  /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: #a1a1aa;
-  opacity: 1; /* Firefox */
+  opacity: 0.8;
 }
 
 #spinner::after {
@@ -63,8 +69,9 @@ body {
 #associated_authors,
 #current_author,
 #current_author_books,
-#header,
-#associated_authors_header {
+header,
+#associated_authors_header,
+footer {
   text-align: center;
   align-items: center;
 }
@@ -77,19 +84,13 @@ img {
   -webkit-transform: translateZ(0);
 }
 
-/* .shadow {
-  position: relative;
-  -webkit-transform: translateZ(0);
-} */
-
-img:hover{
+img:hover {
   transform: scale(1.05);
   cursor: pointer;
 }
 
 #associated_authors_header {
-  /*min-height: 50%;*/
-  margin: 80px 10px 10px 10px;
+  margin: 100px 10px 10px 10px;
 }
 @keyframes spin {
   from {
@@ -114,13 +115,11 @@ img:hover{
   text-align: center;
   margin: 10px 0px 0px 0px;
   border-radius: 5px;
-
 }
 
 .active,
 .accordion:hover {
   background-color: #495057;
-
 }
 
 .accordion:after {
@@ -129,7 +128,6 @@ img:hover{
   font-weight: bold;
   float: right;
   margin-left: 5px;
-
 }
 
 .active:after {
@@ -146,7 +144,6 @@ img:hover{
   z-index: 100;
 }
 
-/* Style the search field */
 #search,
 #search_button {
   display: block;
@@ -167,7 +164,7 @@ img:hover{
   text-align: center;
   color: #27272a;
   border: 1px solid #27272a;
-  border-color: white;
+  border-color: #f5f5f5;
 }
 
 #search_button {

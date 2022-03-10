@@ -86,8 +86,9 @@ async function searchAuthor() {
     } else {
       div = document.createElement("div");
       div.append("No books found by " + searched_author);
-      document.getElementById("current_author_books").appendChild(div);
-      document.getElementById("associated_authors").setAttribute("hidden", "");
+      document.getElementById("associated_authors").appendChild(div);
+      document.getElementById("associated_authors").removeAttribute("hidden");    
+      document.getElementById("current_author_books").setAttribute("hidden", "");
       document.getElementById("current_author").setAttribute("hidden", "");
     }
   }
@@ -171,6 +172,12 @@ function addAuthors() {
   .getElementById("associated_authors").removeAttribute("hidden");
   document
   .getElementById("associated_authors_header").removeAttribute("hidden");
+
+  document
+  .getElementById("current_author").removeAttribute("hidden");
+  document
+  .getElementById("current_author_books").removeAttribute("hidden");
+
 
     document
       .getElementById("associated_authors_header")

@@ -9,23 +9,25 @@
 <html>
   <body>
     <div id="title">NextRead 📚</div>
-    <div id="header">
+    <header>
       <br />
-      <b style ="color:#84cc16">What you do:</b> Search for your favorite author, NextRead finds their
-      author endorsements/other mentioned authors!
+      <b style="color: #84cc16">What you do:</b> Search for your favorite
+      author, NextRead finds their author endorsements/other mentioned authors!
       <br />
       <br />
-      <b style ="color:#84cc16">How it works:</b> NextRead scans the searched author's 
-      first 10 book results from Google Books, scanning through the book
-      description and returns any mentioned authors. <br />
+      <b style="color: #84cc16">How it works:</b> NextRead scans the searched
+      author's first 10 book results from Google Books, scanning through the
+      book description and returns any mentioned authors. <br />
       <br />
+    </header>
+
+    <div id="search_box_div">
+      <input type="search" id="search" placeholder="i.e. Steve Cavanagh" />
+      <button onclick="searchAuthor()" type="button" id="search_button">
+        Search
+      </button>
     </div>
 
-    <div id="search_box_div"><input type="search" id="search" placeholder="i.e. Steve Cavanagh" />
-    <button onclick="searchAuthor()" type="button" id="search_button">  Search
-    </button></div>
-    
-    
     <div id="associated_authors_header"></div>
     <div id="associated_authors"></div>
     <div id="spinner"></div>
@@ -33,9 +35,10 @@
     <br />
     <div id="current_author"></div>
     <div id="current_author_books"></div>
+    <script type="text/javascript" src="assets\js\books.js"></script>
 
-    <div class="footer">
-      <script type="text/javascript" src="assets\js\books.js"></script>
-    </div>
+    <footer>
+      github, blog, website, not related with WorldCat or google books just using free APIs, non-DOD related project
+    </footer>
   </body>
 </html>
