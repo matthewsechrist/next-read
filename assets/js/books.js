@@ -213,8 +213,8 @@ function addAuthors() {
       .append("Then click a book to see which local library owns it!");
 
     // Iterate over each mentioned, remove the item if the name is the same as
-    // the current author, or call getFirst10Books() passing in the 
-    // the author from the authors array  
+    // the current author, or call getFirst10Books() passing in the
+    // the author from the authors array
     for (author_index in ordered_authors) {
       //Remove the currently searched author
       if (
@@ -231,18 +231,23 @@ function addAuthors() {
 
 // This functions adds HTML elements for the first 10 books return for each mentioned author
 async function getFirst10Books(mentioned_author) {
-  let authors_books = await fetch(
+  let mentioned_author_books = await fetch(
     'https://www.googleapis.com/books/v1/volumes?q=inauthor:${"' +
       mentioned_author +
       '"}&maxResults=10'
   ).then((response) => response.json());
 
-  // Create HTML elements
+  // Creates a var that holds the name of the mentioned author with no spaces.
+  // This will be the base of the var names for the HTML elements, attaching an _ and one
+  // of the following HTML element types: button, a, img, p, and div
+  var mentioned_author_name = mentioned_author.replace(/\s+/g, "");
+
+  // Create mentioned author HTML elements
   mentioned_author_div = document.createElement("div");
   mentioned_author_p = document.createElement("p");
   mentioned_author_button = document.createElement("button");
 
-  // Set the class names for the accordion
+  // Create the accordion HTML element for all mentioned author
   mentioned_author_button.className = "accordion";
   mentioned_author_div.className = "panel";
 
@@ -250,18 +255,19 @@ async function getFirst10Books(mentioned_author) {
   mentioned_author_button.textContent = mentioned_author;
 
   // Set the id for each HTML element
-  mentioned_author_button.setAttribute(
-    "id",
-    mentioned_author.replace(/\s+/g, "") + "_button"
-  );
-  mentioned_author_p.setAttribute("id", mentioned_author.replace(/\s+/g, "") + "_p");
-  mentioned_author_div.setAttribute("id", mentioned_author.replace(/\s+/g, ""));
+  mentioned_author_button.setAttribute("id", mentioned_author_name + "_button");
+  mentioned_author_p.setAttribute("id", mentioned_author_name + "_p");
+  mentioned_author_div.setAttribute("id", mentioned_author_name);
 
   // Adds the author HTML elements to the associate_authors div
-  document.getElementById("mentioned_authors").appendChild(mentioned_author_button);
-  document.getElementById("mentioned_authors").appendChild(mentioned_author_div);
   document
-    .getElementById(mentioned_author.replace(/\s+/g, ""))
+    .getElementById("mentioned_authors")
+    .appendChild(mentioned_author_button);
+  document
+    .getElementById("mentioned_authors")
+    .appendChild(mentioned_author_div);
+  document
+    .getElementById(mentioned_author_name)
     .appendChild(mentioned_author_p);
 
   // This code adds the accordion effect to each author button
@@ -277,16 +283,16 @@ async function getFirst10Books(mentioned_author) {
     }
   });
 
-  // Only adds books to the author div that have an associated ISBN_10. Will need to change
-  // this to thumbnails.
-  for (var book in authors_books.items) {
-    if (authors_books.items[book].volumeInfo.industryIdentifiers) {
-      isbn = authors_books.items[book].volumeInfo.industryIdentifiers;
+  // Adds the searched author's books to the current_author div that have
+  // an associated ISBN_10 value.
+  for (var book in mentioned_author_books.items) {
+    if (mentioned_author_books.items[book].volumeInfo.industryIdentifiers) {
+      isbn = mentioned_author_books.items[book].volumeInfo.industryIdentifiers;
 
       for (j in isbn) {
         if (isbn[j].type === "ISBN_10") {
-          if (authors_books.items[book].volumeInfo.imageLinks) {
-            var src = authors_books.items[
+          if (mentioned_author_books.items[book].volumeInfo.imageLinks) {
+            var src = mentioned_author_books.items[
               book
             ].volumeInfo.imageLinks.thumbnail.replace("http://", "https://");
 
@@ -304,18 +310,14 @@ async function getFirst10Books(mentioned_author) {
             a.appendChild(img);
 
             // Add each book's image and title ina div appended to the content div
-            document
-              .getElementById(mentioned_author.replace(/\s+/g, ""))
-              .appendChild(div);
-            document
-              .getElementById(mentioned_author.replace(/\s+/g, "") + "_p")
-              .append(a);
+            document.getElementById(mentioned_author_name).appendChild(div);
+            document.getElementById(mentioned_author_name + "_p").append(a);
           } else {
-            if (authors_books.items[book].volumeInfo.title) {
+            if (mentioned_author_books.items[book].volumeInfo.title) {
               document
-                .getElementById(mentioned_author.replace(/\s+/g, "") + "_p")
+                .getElementById(mentioned_author_name + "_p")
                 .append(
-                  authors_books.items[book].volumeInfo.title +
+                  mentioned_author_books.items[book].volumeInfo.title +
                     " - No image found  "
                 );
             }
