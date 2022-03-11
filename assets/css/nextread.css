@@ -11,7 +11,7 @@ body {
 }
 
 #current_author,
-#associated_authors_header {
+#mentioned_authors_header {
   font-size: x-large;
   font-weight: bold;
 }
@@ -66,11 +66,11 @@ footer {
   animation: spin 1s infinite linear;
 }
 
-#associated_authors,
+#mentioned_authors,
 #current_author,
 #current_author_books,
 header,
-#associated_authors_header,
+#mentioned_authors_header,
 footer {
   text-align: center;
   align-items: center;
@@ -89,7 +89,7 @@ img:hover {
   cursor: pointer;
 }
 
-#associated_authors_header {
+#mentioned_authors_header {
   margin: 100px 10px 10px 10px;
 }
 @keyframes spin {
