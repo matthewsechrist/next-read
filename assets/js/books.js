@@ -237,7 +237,7 @@ async function getFirst10Books(mentioned_author) {
       '"}&maxResults=10'
   ).then((response) => response.json());
 
-  // Creates a var that holds the name of the mentioned author with no spaces.
+  // Create a variable that holds the name of the mentioned author with no spaces.
   // This will be the base of the var names for the HTML elements, attaching an _ and one
   // of the following HTML element types: button, a, img, p, and div
   var mentioned_author_name = mentioned_author.replace(/\s+/g, "");
@@ -247,11 +247,11 @@ async function getFirst10Books(mentioned_author) {
   mentioned_author_p = document.createElement("p");
   mentioned_author_button = document.createElement("button");
 
-  // Create the accordion HTML element for all mentioned author
+  // Create the accordion and panel HTML element for the mentioned author
   mentioned_author_button.className = "accordion";
   mentioned_author_div.className = "panel";
 
-  // Set the button text to the fetched author name
+  // Set the button text to the mentioned author name
   mentioned_author_button.textContent = mentioned_author;
 
   // Set the id for each HTML element
@@ -270,7 +270,7 @@ async function getFirst10Books(mentioned_author) {
     .getElementById(mentioned_author_name)
     .appendChild(mentioned_author_p);
 
-  // This code adds the accordion effect to each author button
+  // This code adds the accordion opening effect to each mentioned author button
   mentioned_author_button.addEventListener("click", function () {
     this.classList.toggle("active");
 
@@ -283,7 +283,7 @@ async function getFirst10Books(mentioned_author) {
     }
   });
 
-  // Adds the searched author's books to the current_author div that have
+  // Adds the mentioned author's books to the current_author div that have
   // an associated ISBN_10 value.
   for (var book in mentioned_author_books.items) {
     if (mentioned_author_books.items[book].volumeInfo.industryIdentifiers) {
@@ -296,23 +296,25 @@ async function getFirst10Books(mentioned_author) {
               book
             ].volumeInfo.imageLinks.thumbnail.replace("http://", "https://");
 
-            // Set HTML element values
+            // This block of code creates an the image if the thumbnail for 
+            // each book of the mentioned author if it exists, otherwise show "No image found."
+            // For each image, it adds a link the WorldCat page for its ISBN. 
             img = document.createElement("img");
             a = document.createElement("a");
-            div = document.createElement("div");
-            div.style.display = "inline-block";
             img.id = isbn[j].identifier;
             img.src = src;
             href = "https://www.worldcat.org/isbn/" + isbn[j].identifier;
-            console.log(isbn[j]);
             a.href = href;
             a.target = "_blank";
+
             a.appendChild(img);
 
-            // Add each book's image and title ina div appended to the content div
-            document.getElementById(mentioned_author_name).appendChild(div);
+            // Add each book's image and title in a p HTML element for in the HTML div
+            // with the clas name of Panel 
             document.getElementById(mentioned_author_name + "_p").append(a);
           } else {
+            // If the book has a title but no image thumbnail, show the error
+            // "No image found"
             if (mentioned_author_books.items[book].volumeInfo.title) {
               document
                 .getElementById(mentioned_author_name + "_p")

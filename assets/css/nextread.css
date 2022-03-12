@@ -180,3 +180,9 @@ img:hover {
 #search_button:hover {
   border: 1px solid black;
 }
+
+.icons_centered {
+  justify-content: space-evenly;
+  display: flex;
+  margin-top: 5px;
+}
