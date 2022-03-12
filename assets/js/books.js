@@ -289,8 +289,8 @@ async function getFirst10Books(mentioned_author) {
     if (mentioned_author_books.items[book].volumeInfo.industryIdentifiers) {
       isbn = mentioned_author_books.items[book].volumeInfo.industryIdentifiers;
 
-      for (j in isbn) {
-        if (isbn[j].type === "ISBN_10") {
+      for (isbn_index in isbn) {
+        if (isbn[isbn_index].type === "ISBN_10") {
           if (mentioned_author_books.items[book].volumeInfo.imageLinks) {
             var src = mentioned_author_books.items[
               book
@@ -301,9 +301,9 @@ async function getFirst10Books(mentioned_author) {
             // For each image, it adds a link the WorldCat page for its ISBN. 
             img = document.createElement("img");
             a = document.createElement("a");
-            img.id = isbn[j].identifier;
+            img.id = isbn[isbn_index].identifier;
             img.src = src;
-            href = "https://www.worldcat.org/isbn/" + isbn[j].identifier;
+            href = "https://www.worldcat.org/isbn/" + isbn[isbn_index].identifier;
             a.href = href;
             a.target = "_blank";
 

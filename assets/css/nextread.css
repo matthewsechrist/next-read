@@ -84,6 +84,7 @@ img {
   -webkit-transform: translateZ(0);
 }
 
+
 img:hover {
   transform: scale(1.05);
   cursor: pointer;
@@ -182,7 +183,24 @@ img:hover {
 }
 
 .icons_centered {
-  justify-content: space-evenly;
-  display: flex;
-  margin-top: 5px;
+  text-align: center;
+  width:100%;
+  margin: 5px 5px 0px 5px;
+  font-size:40px;
+  height: 35px;
+}
+
+a:visited {
+  color: #f5f5f5;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #84cc16;
+}
+
+#fa-solid {
+  font-size:40px;
+  height: 35px;
+
 }
