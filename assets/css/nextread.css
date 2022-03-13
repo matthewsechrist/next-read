@@ -188,13 +188,15 @@ img:hover {
   height: 35px;
 }
 
-a:visited {
+
+a:link,a:active,a:visited,#fa-solid  {
   color: #f5f5f5;
-  text-decoration: none;
 }
 
 a:hover {
   color: #84cc16;
+  background-color: #27272a;
+
 }
 
 #fa-solid {
