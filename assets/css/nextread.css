@@ -6,8 +6,7 @@
 
 body {
   font-family: Lato;
-  background-color: #cbd5e1;
-  color: #27272a;
+  background-color: #8ec1d6;
 }
 
 #current_author,
@@ -18,25 +17,30 @@ body {
 
 header,
 footer {
-  color: #f5f5f5;
+  color: #3F3F46;
   font-size: large;
 }
 
+footer {
+  background-color:#3F3F46;
+  color:#f3f3f3;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+
+
 #title {
   font-family: Outfit, sans-serif;
-  font-size: xx-large;
+  font-size: 40px;
   text-align: center;
-  color: f5f5f5;
 }
 
-#title,
-header,
-footer {
-  background-color: #27272a;
-}
 
 #current_author_books {
-  background-color: #f3f3f3;
+  background-color: #f4f1de;
 }
 
 #spinner:not([hidden]) {
@@ -88,6 +92,7 @@ img {
 img:hover {
   transform: scale(1.05);
   cursor: pointer;
+
 }
 
 #mentioned_authors_header {
@@ -103,7 +108,7 @@ img:hover {
 }
 
 .accordion {
-  background-color: #3cb35a;
+  background-color: #115E59;
   color: #f3f3f3;
   font-weight: bold;
   cursor: pointer;
@@ -114,13 +119,13 @@ img:hover {
   font-size: large;
   transition: 0.4s;
   text-align: center;
-  margin: 10px 0px 0px 0px;
+  margin: 10px 5px 0 5px;
   border-radius: 5px;
 }
 
 .active,
 .accordion:hover {
-  background-color: #495057;
+  background-color: #235789;
 }
 
 .accordion:after {
@@ -137,12 +142,13 @@ img:hover {
 
 .panel {
   padding: 0 18px;
-  background-color: #f3f3f3;
+  background-color: #f4f1de;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
   border-radius: 0px 0px 5px 5px;
   z-index: 100;
+  color: #3F3F46;
 }
 
 #search,
@@ -156,25 +162,27 @@ img:hover {
 
 #search_box_div {
   margin-top: 10px;
-  margin-bottom: 50px;
+  margin-bottom: 100px;
+  padding: 10px 0 10px 0;
+  background-color: #8ec1d6;
 }
 
 #search {
   border-radius: 30px;
   width: 50%;
   text-align: center;
-  color: #27272a;
-  border: 1px solid #27272a;
-  border-color: #f5f5f5;
+  color: #14213d;
+  border: 1px solid #14213d;
+  border-color: #3F3F46;
 }
 
 #search_button {
   border-radius: 5px;
   width: 20%;
-  color: #f5f5f5;
-  background-color: #3b82f6;
+  color: white;
+  background-color: #0077b6;
   margin-top: 5px;
-  border: 1px solid #3b82f6;
+  border: 1px solid #0077b6;
 }
 
 #search:hover,
@@ -190,16 +198,20 @@ img:hover {
 
 
 a:link,a:active,a:visited,#fa-solid  {
-  color: #f5f5f5;
+  color: #fefefe;
 }
 
 a:hover {
-  color: #84cc16;
-  background-color: #27272a;
+  color: #81B29A;
+  background-color:transparent;
 
 }
 
 #fa-solid {
   font-size:40px;
   height: 35px;
+}
+
+.highlighted_text{
+  color:#3F3F46;
 }
