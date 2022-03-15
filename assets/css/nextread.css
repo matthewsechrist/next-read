@@ -6,7 +6,7 @@
 
 body {
   font-family: Lato;
-  background-color: #8ec1d6;
+  background-color: #d6ccc2;
 }
 
 #current_author,
@@ -15,16 +15,15 @@ body {
   font-weight: bold;
 }
 
-header,
-footer {
-  color: #3F3F46;
+header {
+  background-color:#1d3557;
+  color:#f3f3f3;
   font-size: large;
 }
 
 footer {
-  background-color:#3F3F46;
+  background-color:#1d3557;
   color:#f3f3f3;
-  position: fixed;
   left: 0;
   bottom: 0;
   width: 100%;
@@ -36,11 +35,14 @@ footer {
   font-family: Outfit, sans-serif;
   font-size: 40px;
   text-align: center;
+  background-color:#1d3557;
+  color: #fefefe;
 }
 
 
 #current_author_books {
-  background-color: #f4f1de;
+  background-color: #d6ccc2;
+  padding-bottom: 110px;
 }
 
 #spinner:not([hidden]) {
@@ -164,7 +166,6 @@ img:hover {
   margin-top: 10px;
   margin-bottom: 100px;
   padding: 10px 0 10px 0;
-  background-color: #8ec1d6;
 }
 
 #search {
@@ -213,5 +214,5 @@ a:hover {
 }
 
 .highlighted_text{
-  color:#3F3F46;
+  color:#81B29A;
 }
