@@ -17,9 +17,11 @@ async function searchAuthor() {
     document.getElementById("current_author").innerHTML =
       "";
   document.getElementById("mentioned_authors").setAttribute("hidden", "");
-  document
-    .getElementById("mentioned_authors_header")
-    .setAttribute("hidden", "");
+  document.getElementById("mentioned_authors_header").setAttribute("hidden", "");
+
+  document.getElementById("current_author").setAttribute("hidden", "");
+  document.getElementById("current_author_books").setAttribute("hidden", "");
+
 
   // If a valid author is searched, display the first 10 books for the searched author
   if (searched_author) {
