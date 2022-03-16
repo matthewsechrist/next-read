@@ -6,7 +6,12 @@
 
 body {
   font-family: Lato;
-  background-image: radial-gradient( circle farthest-corner at 12.3% 19.3%,  rgba(85,88,218,1) 0%, rgba(95,209,249,1) 100.2% );    display: flex;
+
+  background-color: #FBAB7E;
+  background-image: linear-gradient(62deg, #FBAB7E 0%, #F7CE68 100%);
+  
+  
+  display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -34,23 +39,28 @@ footer {
   width: 100%;
 }
 
-header, footer {
+header, footer,#search_description  {
   text-align: center;
+  
+}
+
+#search_description {
+font-weight: 800;
 }
 
 
 #title {
   font-family:  'Playfair Display', serif;
-  font-size: 40px;
+  font-size: 50px;
+
   text-align: center;
   background-color:#242423;
-  color: #fefefe;
+  color: #e76f51;
 }
 
 
 #current_author_books {
   padding-bottom: 10px;
-  background-color: #f4f1de;
 }
 
 #spinner:not([hidden]) {
@@ -120,7 +130,7 @@ img:hover {
 }
 
 .accordion {
-  background-color: #001d3d;
+  background-color: #242423;
   color: #f3f3f3;
   font-weight: bold;
   cursor: pointer;
@@ -130,30 +140,26 @@ img:hover {
   outline: none;
   font-size: large;
   transition: 0.4s;
-  text-align: center;
   margin: 10px 5px 0 5px;
   border-radius: 5px;
-  transition: 0.4s;
+  height:67px;
 }
 
 .active,
 .accordion:hover {
-  background-color: #235789;
+  background-color: #577590;
 }
 
 .accordion:after {
   content: "\002B";
   color: #f3f3f3;
   font-weight: bold;
-  float: right;
-  margin: 10px 5px 0 5px;
-
+  float:right;
 }
 
 .active:after {
   content: "\2212";
   float:right;
-  margin-left:5px;
 }
 
 .panel {
@@ -195,6 +201,7 @@ img:hover {
   border-color: #242423;
 }
 
+
 #search_button {
   border-radius: 5px;
   width: 20%;
@@ -217,21 +224,14 @@ img:hover {
 }
 
 
-a:link,a:active,a:visited,#fa-solid  {
+a:link, a:active,a:visited,#fa-solid  {
   color: #fefefe;
 }
 
 a:hover {
-  color: #81B29A;
+  color: #e76f51;
   background-color:transparent;
 
 }
 
-#fa-solid {
-  font-size:40px;
-  height: 35px;
-}
 
-.highlighted_text{
-  color:#81B29A;
-}
