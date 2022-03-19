@@ -154,7 +154,7 @@ input.addEventListener("keyup", function (event) {
 function addAuthors() {
   var flattened_authors = [],
     filtered_authors = [];
-
+console.log(authors)
   // Flatten multiple author array results into one flat authors array
   flattened_authors = authors.flat();
 
