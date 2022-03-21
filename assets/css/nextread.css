@@ -209,11 +209,12 @@ img:hover {
   background-color: #001d3d;
   margin-top: 5px;
   border: 1px solid #001d3d;
+  cursor: pointer;
 }
 
 #search:hover,
 #search_button:hover {
-  border: 1px solid black;
+  border: 1px solid #e76f51;
 }
 
 .icons_centered {
