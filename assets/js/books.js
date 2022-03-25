@@ -25,8 +25,8 @@ async function searchAuthor() {
   if (searched_author) {
     let books = await fetch(
       'https://www.googleapis.com/books/v1/volumes?q=inauthor:${"' +
-        searched_author +
-        '"}&maxResults=10'
+        searched_author 
+        +'"}&maxResults=40'
     ).then((response) => response.json());
 
     // Only create the associated authors and current author HTML elements if the searched author is found
@@ -42,49 +42,59 @@ async function searchAuthor() {
       // Each book result must have a 10 digit ISBN and a book description for NextRead to work correctly.
       // An array of ISBNs is sent for further processing to the getMentionedAuthors() function
       for (var book in books.items) {
-        isbn = books.items[book].volumeInfo.industryIdentifiers;
+        if (books.items[book].volumeInfo.industryIdentifiers) {
+          isbn = books.items[book].volumeInfo.industryIdentifiers;
 
-        for (var isbn_counter = 0; isbn_counter < isbn.length; isbn_counter++) {
-          if (
-            isbn[isbn_counter].type === "ISBN_10" &&
-            books.items[book].volumeInfo.description
+          for (
+            var isbn_counter = 0;
+            isbn_counter < isbn.length;
+            isbn_counter++
           ) {
-            isbns.push(isbn[isbn_counter].identifier);
+            if (
+              isbn[isbn_counter].type === "ISBN_10" &&
+              books.items[book].volumeInfo.description
+            ) {
+              isbns.push(isbn[isbn_counter].identifier);
 
-            // Need to change from HTTP to HTTPS for the Google Books image link
-            // if a valid thumbnail URL exists
-            if (books.items[book].volumeInfo.imageLinks) {
-              var src = books.items[
-                book
-              ].volumeInfo.imageLinks.thumbnail.replace("http://", "https://");
+              // Need to change from HTTP to HTTPS for the Google Books image link
+              // if a valid thumbnail URL exists
+              if (books.items[book].volumeInfo.imageLinks) {
+                var src = books.items[
+                  book
+                ].volumeInfo.imageLinks.thumbnail.replace(
+                  "http://",
+                  "https://"
+                );
+              }
+
+              // Below creates a centered div containing each book for the search author as an image
+              // that links to that book's WorldCat page
+              current_author_img = document.createElement("img");
+              current_author_a = document.createElement("a");
+              current_author_div = document.createElement("div");
+
+              current_author_div.style.display = "inline-block";
+              current_author_img.id = isbn[isbn_counter].identifier;
+              current_author_img.src = src;
+              current_author_href =
+                "https://www.worldcat.org/isbn/" +
+                isbn[isbn_counter].identifier;
+              current_author_a.href = current_author_href;
+              current_author_a.target = "_blank";
+
+              current_author_a.appendChild(current_author_img);
+              current_author_div.setAttribute(
+                "id",
+                isbn[isbn_counter].identifier.toString()
+              );
+
+              document
+                .getElementById("current_author_books")
+                .appendChild(current_author_div);
+              document
+                .getElementById(isbn[isbn_counter].identifier.toString())
+                .append(current_author_a);
             }
-
-            // Below creates a centered div containing each book for the search author as an image
-            // that links to that book's WorldCat page
-            current_author_img = document.createElement("img");
-            current_author_a = document.createElement("a");
-            current_author_div = document.createElement("div");
-
-            current_author_div.style.display = "inline-block";
-            current_author_img.id = isbn[isbn_counter].identifier;
-            current_author_img.src = src;
-            current_author_href =
-              "https://www.worldcat.org/isbn/" + isbn[isbn_counter].identifier;
-            current_author_a.href = current_author_href;
-            current_author_a.target = "_blank";
-
-            current_author_a.appendChild(current_author_img);
-            current_author_div.setAttribute(
-              "id",
-              isbn[isbn_counter].identifier.toString()
-            );
-
-            document
-              .getElementById("current_author_books")
-              .appendChild(current_author_div);
-            document
-              .getElementById(isbn[isbn_counter].identifier.toString())
-              .append(current_author_a);
           }
         }
       }
@@ -154,7 +164,7 @@ input.addEventListener("keyup", function (event) {
 function addAuthors() {
   var flattened_authors = [],
     filtered_authors = [];
-console.log(authors)
+  console.log(authors);
   // Flatten multiple author array results into one flat authors array
   flattened_authors = authors.flat();
 
@@ -296,21 +306,22 @@ async function getFirst10Books(mentioned_author) {
               book
             ].volumeInfo.imageLinks.thumbnail.replace("http://", "https://");
 
-            // This block of code creates an the image if the thumbnail for 
+            // This block of code creates an the image if the thumbnail for
             // each book of the mentioned author if it exists, otherwise show "No image found."
-            // For each image, it adds a link the WorldCat page for its ISBN. 
+            // For each image, it adds a link the WorldCat page for its ISBN.
             img = document.createElement("img");
             a = document.createElement("a");
             img.id = isbn[isbn_index].identifier;
             img.src = src;
-            href = "https://www.worldcat.org/isbn/" + isbn[isbn_index].identifier;
+            href =
+              "https://www.worldcat.org/isbn/" + isbn[isbn_index].identifier;
             a.href = href;
             a.target = "_blank";
 
             a.appendChild(img);
 
             // Add each book's image and title in a p HTML element for in the HTML div
-            // with the clas name of Panel 
+            // with the clas name of Panel
             document.getElementById(mentioned_author_name + "_p").append(a);
           } else {
             // If the book has a title but no image thumbnail, show the error
