@@ -160,6 +160,16 @@ input.addEventListener("keyup", function (event) {
   }
 });
 
+var input = document.getElementById("search_button");
+input.addEventListener("click", function (event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+
+    searchAuthor();
+  }
+});
+
+
 // This function cleans up the authors list and adds the mentioned authors HTML elements
 function addAuthors() {
   var flattened_authors = [],
