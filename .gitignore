@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 NextRead.code-workspace
 index2.html
+.DS_Store
