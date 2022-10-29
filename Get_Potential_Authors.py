@@ -1,5 +1,4 @@
-import json
-import re
+import json, re, sys
 from urllib.request import urlopen
 
 # This function takes in a potential ISBN and parses though the book's description
@@ -38,6 +37,8 @@ def next_read(event, context):
         potential_authors = [i for n, i in enumerate(
             potential_authors) if i not in potential_authors[n + 1:]]
 
+        
+        print(potential_authors)
         return {"potential_authors": potential_authors}
     else:
         return None
@@ -48,3 +49,6 @@ def not_common_word(word):
     if (word in ['The', 'In', 'But', 'My', 'She', 'New', 'York', 'Times', 'City', 'When', 'Do', 'So', 'Be', 'And', 'United', 'States', 'Press', 'Associated', 'Miami', 'Herald']):
         return False
     return True
+
+if __name__ == '__main__':
+    next_read({'book':sys.argv[1]},"")    
