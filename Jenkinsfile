@@ -8,7 +8,7 @@ pipeline {
     }
     stage('hello') {
       steps {
-        sh 'python3 Get_Potential_Authors.py'
+        sh 'python3 Get_Potential_Authors.py "140919874X"'
       }
     }
   }
