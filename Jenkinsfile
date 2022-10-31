@@ -2,7 +2,7 @@
 
 pipeline {
   // Assign to docker agent(s) label, could also be 'any'
-any
+agent any
   stages {
     stage('Docker node test') {
       agent {
@@ -34,3 +34,5 @@ any
     }
   }
 }
+
+
