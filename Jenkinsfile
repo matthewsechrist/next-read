@@ -8,7 +8,6 @@ agent any
       agent {
         docker {
           // Set both label and image
-          label 'docker'
           image 'node:7-alpine'
           args '--name docker-node' // list any args
         }
@@ -23,7 +22,6 @@ agent any
       agent {
         docker {
           // Set both label and image
-          label 'docker'
           image 'matthewsechrist/next-read'
         }
       }
