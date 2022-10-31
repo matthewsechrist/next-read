@@ -1,10 +1,12 @@
 pipeline {
-  agent any
-  stages {
-    stage('Repo'){
-steps('Clone repository') {
-        /* Let's make sure we have the repository cloned to our workspace */
-
-        checkout scm
-    }  }}
+    agent {
+        docker { image 'matthewsechrist/next-read' }
+    }
+    stages {
+        stage('Test') {
+            steps {
+                sh 'docker run next-read 140919874X'
+            }
+        }
+    }
 }
