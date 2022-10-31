@@ -1,15 +1,9 @@
 pipeline {
   agent any
   stages {
-    stage('version') {
-      steps {
-        sh 'python3 --version'
-      }
-    }
-    stage('hello') {
-      steps {
-        sh 'python3 Get_Potential_Authors.py "140919874X"'
-      }
-    }
-  }
+stage('Clone repository') {
+        /* Let's make sure we have the repository cloned to our workspace */
+
+        checkout scm
+    }  }
 }
