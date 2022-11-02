@@ -11,7 +11,7 @@ pipeline {
                 }
             }
             steps {
-              POTENTIAL_AUTHORS = sh(script: "python Get_Potential_Authors.py 140919874X", returnStdout: true).toString().trim()
+              POTENTIAL_AUTHORS = sh(script: "python Get_Potential_Authors.py 140919874X", returnStdout: true)
               print("$POTENTIAL_AUTHORS") 
             }
         }
