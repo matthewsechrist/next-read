@@ -1,24 +1,15 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.12-rc-slim-buster'
-        }
-    }
-
+    agent none 
     stages {
-    stage('next-read') {
-      agent {
-        docker {
-          // Set both label and image
-          image 'matthewsechrist/next-read'
+        stage('Build') { 
+            agent {
+                docker {
+                    image 'python:3.12-rc-slim-buster' 
+                }
+            }
+            steps {
+                sh 'python Get_Potential_Authors.py 140919874X' 
+            }
         }
-      }
-      steps {
-        // Steps run in maven:3-alpine docker container on docker agent
-        sh 'docker run next-read 140919874X'
-      }
-    }
     }
 }
-
-
