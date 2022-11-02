@@ -6,16 +6,18 @@ pipeline {
     }
 
     stages {
-        stage('Stage 1') {
-            steps {
-                sh 'echo foo'
-            }
+    stage('next-read') {
+      agent {
+        docker {
+          // Set both label and image
+          image 'matthewsechrist/next-read'
         }
-        stage('Stage 2') {
-            steps {
-                sh 'echo bar'
-            }
-        }
+      }
+      steps {
+        // Steps run in maven:3-alpine docker container on docker agent
+        sh 'docker run next-read 140919874X'
+      }
+    }
     }
 }
 
