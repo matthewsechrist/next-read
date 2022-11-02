@@ -8,7 +8,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'python Get_Potential_Authors.py 140919874X' 
+                sh 'python Get_Potential_Authors.py 140919874X', returnStdout: true 
             }
         }
     }
