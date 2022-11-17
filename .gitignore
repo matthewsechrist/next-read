@@ -132,3 +132,4 @@ index2.html
 .DS_Store
 docker run -it --entrypoint sh next-read.md
 Jenkinsfile2
+assets/.DS_Store
