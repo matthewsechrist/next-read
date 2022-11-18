@@ -8,7 +8,8 @@ pipeline {
     stages {
         stage('Test'){
             steps{
-        //sh 'python Get_Potential_Authors.py 140919874X'
-        sh 'top'
-    }}}
+                sh 'python Get_Potential_Authors.py 140919874X'
+            }
+        }
+    }
 }
