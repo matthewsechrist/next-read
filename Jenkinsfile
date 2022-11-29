@@ -18,10 +18,11 @@ pipeline {
                 sh 'ggshield secret scan ci'
             }
             }
-        }
+        
         stage('Test'){
             steps{
                 sh 'python Get_Potential_Authors.py 140919874X'
             }
         }
+    }
     }
