@@ -13,9 +13,10 @@ pipeline {
             agent {
                 docker { image 'gitguardian/ggshield:latest' }
             }
-            }
+            
             steps {
                 sh 'ggshield secret scan ci'
+            }
             }
         }
         stage('Test'){
