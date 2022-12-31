@@ -10,7 +10,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'docker run hello-world'
+                sh 'docker ps - a'
             }
         }
 
