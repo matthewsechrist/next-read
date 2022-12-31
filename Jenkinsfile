@@ -6,6 +6,7 @@ pipeline {
             agent {
                 docker {
                     image 'python:3.12-rc-slim-buster'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
             steps{
