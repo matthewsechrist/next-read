@@ -2,6 +2,18 @@ pipeline {
 
     agent none
     stages {
+        stage ('First Step') {
+            agent {
+                docker {
+                    image 'docker'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
+            steps {
+                sh 'docker run hello-world'
+            }
+        }
+
         stage('Test'){
             agent {
                 docker {
