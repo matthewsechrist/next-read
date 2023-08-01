@@ -90,7 +90,7 @@ async function searchAuthor() {
           img = document.createElement("img");
           a = document.createElement("a");
           img.id = results.authors[name].book_results[book_result].title;
-          img.src = results.authors[name].book_results[book_result].thumbnail;
+          img.src = results.authors[name].book_results[book_result].thumbnail.replace('http://','https://');
           href =
             "https://www.worldcat.org/isbn/" +
             results.authors[name].book_results[book_result].isbn;
