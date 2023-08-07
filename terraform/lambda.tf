@@ -1,15 +1,42 @@
-# The Terraform file creates the Lambda function for GetVisitorCount
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
 
-# Creates the Lambda function 
-resource "aws_lambda_function" "GetVisitorCount_lambda_function" {
-  function_name = data.aws_ssm_parameter.lambda_function_name.value
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
 
-  s3_bucket     = data.aws_ssm_parameter.backup_bucket_name.value
-  s3_key        = data.aws_ssm_parameter.lambda_s3_file.value
+    actions = ["sts:AssumeRole"]
+  }
+}
 
-  handler       = data.aws_ssm_parameter.lambda_handler.value
-  runtime       = data.aws_ssm_parameter.lambda_runtime.value
+resource "aws_iam_role" "iam_for_lambda" {
+  name               = "iam_for_lambda"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
 
-  role          = aws_iam_role.lambda_role.arn
-  publish       = true
+data "archive_file" "lambda" {
+  type        = "zip"
+  source_file = "lambda.js"
+  output_path = "lambda_function_payload.zip"
+}
+
+resource "aws_lambda_function" "test_lambda" {
+  # If the file is not in the current working directory you will need to include a
+  # path.module in the filename.
+  filename      = "lambda_function_payload.zip"
+  function_name = "lambda_function_name"
+  role          = aws_iam_role.iam_for_lambda.arn
+  handler       = "index.test"
+
+  source_code_hash = data.archive_file.lambda.output_base64sha256
+
+  runtime = "nodejs18.x"
+
+  environment {
+    variables = {
+      foo = "bar"
+    }
+  }
 }
