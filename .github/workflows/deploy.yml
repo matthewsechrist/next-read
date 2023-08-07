@@ -1,0 +1,50 @@
+name: 'Deploy to Lambda Function'
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Repo Tag Name (Ex.: yyyymmdd-hhmmss)'
+        type: string
+        required: true
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/github-script@v6
+        name: 'Check Git Tag'
+        with:
+          script: |
+            const refResponse = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'tags/${{ inputs.version }}'
+            });
+
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_S3_BUCKET_REGION }}
+
+      - name: 'Check S3 Bucket'
+        run: |
+          aws s3api wait object-exists \
+            --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} \
+            --key ${{ inputs.version }}.zip \
+            --cli-read-timeout 60 \
+            --cli-connect-timeout 60
+  
+      - name: 'Update Source Code'
+        run: |
+          echo "Deploy Version: ${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "Update Lambda Function with ${{ inputs.version }}.zip file" >> $GITHUB_STEP_SUMMARY
+          aws lambda update-function-code \
+            --function-name=${{ secrets.AWS_LAMBDA_FUNCTION_NAME }} \
+            --s3-bucket=${{ secrets.AWS_S3_BUCKET_NAME }} \
+            --s3-key=${{ inputs.version }}.zip \
+            --cli-read-timeout 60 \
+            --cli-connect-timeout 60
