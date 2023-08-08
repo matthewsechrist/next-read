@@ -20,7 +20,7 @@ jobs:
             const refResponse = await github.git.getRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'tags/${{ inputs.version }}'
+              ref: "tags/12345"
             });
 
       - name: 'Configure AWS Credentials'
