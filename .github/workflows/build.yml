@@ -20,13 +20,20 @@ jobs:
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Tag Version: $TAG" >> $GITHUB_STEP_SUMMARY
     
-      - name: 'Create Zip File'
-        id: 'create_package'
+      - name: 'Create AuthorNameIsUpper Zip File'
+        id: 'create_AuthorNameIsUpper_package'
         run: |
-          PACKAGE_NAME="${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}.zip"
+          PACKAGE_NAME="AuthorNameIsUpper.zip"
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
           zip -r $PACKAGE_NAME lambda/AuthorNameIsUpper
 
+      - name: 'Create NewNextRead Zip File'
+        id: 'create_NewNextRead_package'
+        run: |
+          PACKAGE_NAME="NewNextRead.zip"
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          zip -r $PACKAGE_NAME lambda/NewNextRead
+  
 
       - name: 'Configure AWS Credentials'
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -37,7 +44,8 @@ jobs:
 
 
       - name: 'Upload to S3 Bucket'
-        run: aws s3 cp ${{ steps.create_package.outputs.package_name }} s3://${{ secrets.AWS_S3_BUCKET_NAME }}
+        run: aws s3 cp ${{ steps.create_package.outputs.create_AuthorNameIsUpper_package }} s3://${{ secrets.AWS_S3_BUCKET_NAME }} &&
+             aws s3 cp ${{ steps.create_package.outputs.create_NewNextRead_package }} s3://${{ secrets.AWS_S3_BUCKET_NAME }}
 
 
       - uses: actions/github-script@v6
