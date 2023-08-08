@@ -5,7 +5,7 @@ on:
     branches:
       - master
 
-      
+
 jobs:
   Build_and_Upload:
     permissions:
@@ -51,3 +51,4 @@ jobs:
               ref: 'refs/tags/${{ steps.generate_tag_version.outputs.tag }}',
               sha: context.sha
             })
+            
