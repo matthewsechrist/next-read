@@ -1,29 +1,15 @@
 name: 'Deploy to Lambda Function'
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Repo Tag Name (Ex.: yyyymmdd-hhmmss)'
-        type: string
-        required: true
-
-
+    workflow_run:
+      workflows: ["Build and upload to S3 Bucket"]
+      types:
+        - completed
 jobs:
   Deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/github-script@v6
-        name: 'Check Git Tag'
-        with:
-          script: |
-            const refResponse = await github.rest.git.getRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: "tags/${{ inputs.version }}"
-            });
-
       - name: 'Configure AWS Credentials'
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
