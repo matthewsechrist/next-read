@@ -44,8 +44,8 @@ jobs:
 
 
       - name: 'Upload to S3 Bucket'
-        run: aws s3 cp ${{ steps.create_AuthorNameIsUpper_package.outputs.create_AuthorNameIsUpper_package }} s3://${{ secrets.AWS_S3_BUCKET_NAME }} &&
-             aws s3 cp ${{ steps.create_NewNextRead_package.outputs.create_NewNextRead_package }} s3://${{ secrets.AWS_S3_BUCKET_NAME }}
+        run: aws s3 cp ${{ steps.create_AuthorNameIsUpper_package.outputs.package_name }} s3://${{ secrets.AWS_S3_BUCKET_NAME }} &&
+             aws s3 cp ${{ steps.create_NewNextRead_package.outputs.package_name }} s3://${{ secrets.AWS_S3_BUCKET_NAME }}
 
 
       - uses: actions/github-script@v6
@@ -59,4 +59,3 @@ jobs:
               sha: context.sha
             })
 
-            
