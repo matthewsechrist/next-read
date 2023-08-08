@@ -17,7 +17,7 @@ jobs:
         name: 'Check Git Tag'
         with:
           script: |
-            const refResponse = await github.rest.git.getRef({
+            const refResponse = await github.git.getRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: 'tags/${{ inputs.version }}'
