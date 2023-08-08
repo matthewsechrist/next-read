@@ -25,14 +25,14 @@ jobs:
         run: |
           PACKAGE_NAME="AuthorNameIsUpper.zip"
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
-          zip $PACKAGE_NAME lambda/AuthorNameIsUpper
+          zip $PACKAGE_NAME lambda/AuthorNameIsUpper/lambda_function.py
 
       - name: 'Create NewNextRead Zip File'
         id: 'create_NewNextRead_package'
         run: |
           PACKAGE_NAME="NewNextRead.zip"
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
-          zip $PACKAGE_NAME lambda/NewNextRead
+          zip $PACKAGE_NAME lambda/NewNextRead/lambda_function.py
   
 
       - name: 'Configure AWS Credentials'
