@@ -21,7 +21,7 @@ jobs:
             const refResponse = await github.rest.git.getRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: "tags/v2.0.0"
+              ref: "tags/${{ inputs.version }}"
             });
 
       - name: 'Configure AWS Credentials'
@@ -35,17 +35,34 @@ jobs:
         run: |
           aws s3api wait object-exists \
             --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} \
-            --key ${{ inputs.version }}.zip \
+            --key AuthorNameIsUpper.zip \
             --cli-read-timeout 60 \
             --cli-connect-timeout 60
+
+          aws s3api wait object-exists \
+            --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} \
+            --key NewNextRead.zip \
+            --cli-read-timeout 60 \
+            --cli-connect-timeout 60
+
   
       - name: 'Update Source Code'
         run: |
-          echo "Deploy Version: ${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "Deploy AuthorNameIsUpper Version: ${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "Update Lambda Function with ${{ inputs.version }}.zip file" >> $GITHUB_STEP_SUMMARY
           aws lambda update-function-code \
-            --function-name=${{ secrets.AWS_LAMBDA_FUNCTION_NAME }} \
+            --function-name=AuthorNameIsUpper \
             --s3-bucket=${{ secrets.AWS_S3_BUCKET_NAME }} \
-            --s3-key=${{ inputs.version }}.zip \
+            --s3-key=AuthorNameIsUpper.zip \
             --cli-read-timeout 60 \
             --cli-connect-timeout 60
+
+            echo "Deploy NewNextRead Version: ${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "Update Lambda Function with ${{ inputs.version }}.zip file" >> $GITHUB_STEP_SUMMARY
+            aws lambda update-function-code \
+              --function-name=NewNextRead \
+              --s3-bucket=${{ secrets.AWS_S3_BUCKET_NAME }} \
+              --s3-key=NewNextRead.zip \
+              --cli-read-timeout 60 \
+              --cli-connect-timeout 60
+  
