@@ -25,7 +25,7 @@ jobs:
         run: |
           PACKAGE_NAME="${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}.zip"
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
-          zip -r $PACKAGE_NAME lambda/AuthorNameIsUpper/.
+          zip -r $PACKAGE_NAME lambda/AuthorNameIsUpper
 
 
       - name: 'Configure AWS Credentials'
