@@ -23,9 +23,9 @@ jobs:
       - name: 'Create Zip File'
         id: 'create_package'
         run: |
-          PACKAGE_NAME="${{ steps.generate_tag_version.outputs.tag }}.zip"
+          PACKAGE_NAME="${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}.zip"
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
-          zip -r $PACKAGE_NAME .
+          zip -r $PACKAGE_NAME lambda/AuthorNameIsUpper/.
 
 
       - name: 'Configure AWS Credentials'
