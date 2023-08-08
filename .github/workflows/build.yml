@@ -2,8 +2,8 @@ name: 'Build and upload to S3 Bucket'
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - lambda/**
 
 jobs:
   Build_and_Upload:
