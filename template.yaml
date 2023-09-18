@@ -206,7 +206,7 @@ Resources:
         Route53:
           HostedZoneName: matthewsechrist.cloud.
 
-  #NextReadDomainName: 
+  #NextReadDomainName:  
   #  Type: 'AWS::ApiGateway::DomainName'
   #  Properties:
   #    DomainName: nextreadapi2.matthewsechrist.cloud
