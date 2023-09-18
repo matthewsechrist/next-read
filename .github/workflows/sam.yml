@@ -19,3 +19,5 @@ jobs:
         env:
           SAM_CLI_TELEMETRY: 0     
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+        env:
+          SAM_CLI_TELEMETRY: 0     
