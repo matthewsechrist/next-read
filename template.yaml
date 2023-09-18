@@ -1,0 +1,249 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: next-read
+
+Resources:
+  NextReadStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      DefinitionUri: statemachine/next_read.asl.json
+      DefinitionSubstitutions:
+        NewNextReadArn: !GetAtt NewNextReadFunction.Arn
+        ApiEndpoint: !Sub "${NextReadApi}.execute-api.${AWS::Region}.amazonaws.com"
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref NewNextReadFunction
+        - ComprehendBasicAccessPolicy:
+            FunctionName: !Ref NewNextReadFunction
+
+  ApiCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: matthewsechrist.cloud
+      SubjectAlternativeNames:
+        - "*.matthewsechrist.cloud"
+      ValidationMethod: DNS
+
+  GetAuthorResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt NextReadApi.RootResourceId
+      RestApiId: !Ref NextReadApi
+      PathPart: "{get_author+}"
+
+  NewNextReadResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt NextReadApi.RootResourceId
+      RestApiId: !Ref NextReadApi
+      PathPart: "new_next_read"
+
+  GetAuthorProxyMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: GET
+      ResourceId: !Ref GetAuthorResource
+      RestApiId: !Ref NextReadApi
+      AuthorizationType: NONE
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+          ResponseModels:
+            application/json: !Ref ApiGatewayModel
+          StatusCode: 200
+      RequestParameters:
+        method.request.path.get_author: true
+      Integration:
+        RequestParameters:
+          integration.request.path.get_author: "method.request.path.get_author"
+        IntegrationHttpMethod: GET
+        Type: HTTP_PROXY
+        Uri: https://www.googleapis.com/books/v1/volumes?q=inauthor:{get_author}
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+          - StatusCode: 200
+
+  ApiGatewayModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: "application/json"
+      RestApiId: !Ref NextReadApi
+      Schema: {}
+
+  GetAuthorOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+          ResponseModels:
+            application/json: !Ref ApiGatewayModel
+          StatusCode: 200
+      HttpMethod: OPTIONS
+      ResourceId: !Ref GetAuthorResource
+      RestApiId: !Ref NextReadApi
+      Integration:
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        Type: MOCK
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'https://matthewsechrist.cloud'"
+            StatusCode: 200
+
+  NewNextReadOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+          ResponseModels:
+            application/json: !Ref ApiGatewayModel
+          StatusCode: 200
+      HttpMethod: OPTIONS
+      ResourceId: !Ref NewNextReadResource
+      RestApiId: !Ref NextReadApi
+      Integration:
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        Type: MOCK
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'https://matthewsechrist.cloud'"
+            StatusCode: 200
+
+  ApiGatewayStepFunctionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: !Join ["", ["/", !Ref "AWS::StackName", "/"]]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowApiGatewayServiceToAssumeRole
+            Effect: Allow
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: CallStepFunctions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "states:StartSyncExecution"
+                Resource:
+                  - !Ref NextReadStateMachine
+
+  NewNextReadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/NewNextRead/
+      Handler: lambda_function.new_next_read
+      Runtime: python3.11
+      Architectures:
+        - x86_64
+
+  NewNextReadMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+          ResponseModels:
+            application/json: !Ref ApiGatewayModel
+          StatusCode: 200
+      HttpMethod: POST
+      ResourceId: !Ref NewNextReadResource
+      RestApiId: !Ref NextReadApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS
+        Credentials: !GetAtt ApiGatewayStepFunctionsRole.Arn
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:states:action/StartSyncExecution
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates:
+          application/json: !Sub
+            - |-
+              #set($input = $input.json('$')) 
+              { 
+                "stateMachineArn": "${StateMachineArn}",
+                "input": "$util.escapeJavaScript($input)"
+              }
+            - { StateMachineArn: !Ref NextReadStateMachine }
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'https://matthewsechrist.cloud'"
+            ResponseTemplates:
+              application/json:
+                "#set ($parsedPayload = $util.parseJson($input.json('$.output')))
+                $parsedPayload"
+
+  NextReadApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: next-read
+      StageName: Prod
+      Domain:
+        DomainName: nextreadapi2.matthewsechrist.cloud
+        CertificateArn: !Ref ApiCertificate
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneName: matthewsechrist.cloud.
+
+  #NextReadDomainName:
+  #  Type: 'AWS::ApiGateway::DomainName'
+  #  Properties:
+  #    DomainName: nextreadapi2.matthewsechrist.cloud
+  #    EndpointConfiguration: 
+  #      Types:
+  #        - REGIONAL
+  #    CertificateArn: !Ref ApiCertificate
+#
+  #BasePath:
+  #  Type: AWS::ApiGateway::BasePathMapping
+  #  Properties:
+  #    DomainName: nextreadapi2.matthewsechrist.cloud
+  #    RestApiId: !Ref NextReadApi  # This is my AWS::Serverless::Api resource
+  #    Stage: !Ref NextReadApi.Stage 
+
+  #myDNSRecord:
+  #  Type: AWS::Route53::RecordSet
+  #  Properties:
+  #    AliasTarget:
+  #      DNSName: !GetAtt [NextReadDomainName, RegionalDomainName]
+  #      HostedZoneId: !GetAtt [NextReadDomainName, RegionalHostedZoneId]
+  #    HostedZoneName: matthewsechrist.cloud.
+  #    Name: 'nextreadapi2.matthewsechrist.cloud'
+  #    Type: A
+
+  #NextReadDeployment:
+  #  DependsOn:
+  #    - GetAuthorProxyMethod
+  #    - GetAuthorOptionsMethod
+  #    - NewNextReadOptionsMethod
+  #    - NewNextReadMethod
+  #  Type: AWS::ApiGateway::Deployment
+  #  Properties:
+  #    RestApiId: !Ref NextReadApi
+  #    StageName: !Ref NextReadApi.Stage
+
+Outputs:
+  NextReadApi:
+    Description: "NextReadApi ARN"
+    Value: !Sub "${NextReadApi}.execute-api.${AWS::Region}.amazonaws.com"

@@ -1,0 +1,605 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "Choice",
+    "States": {
+      "Choice": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$$.Execution.Input.author",
+            "IsPresent": true,
+            "Next": "Search Google Books for potential author"
+          }
+        ],
+        "Default": "No searched author found"
+      },
+      "No searched author found": {
+        "Type": "Pass",
+        "End": true,
+        "Parameters": {
+          "error": "No searched author found"
+        }
+      },
+      "Search Google Books for potential author": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::apigateway:invoke",
+        "Parameters": {
+          "ApiEndpoint": "${ApiEndpoint}",
+          "Method": "GET",
+          "Stage": "Prod",
+          "Path.$": "States.Format('{}&maxResults=40',States.JsonToString($$.Execution.Input.author))"
+        },
+        "Next": "Any books by this name?",
+        "OutputPath": "$.ResponseBody"
+      },
+      "Any books by this name?": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.totalItems",
+            "NumericGreaterThan": 0,
+            "Next": "Get first book ID and all Google books results"
+          }
+        ],
+        "Default": "No Books found"
+      },
+      "Get first book ID and all Google books results": {
+        "Type": "Parallel",
+        "Next": "Do any potential authors exist?",
+        "Branches": [
+          {
+            "StartAt": "Get first book ID",
+            "States": {
+              "Get first book ID": {
+                "Type": "Pass",
+                "Parameters": {
+                  "first_book.$": "States.ArrayGetItem($..items[0].id,0)"
+                },
+                "End": true
+              }
+            }
+          },
+          {
+            "StartAt": "Get All Books",
+            "States": {
+              "Get All Books": {
+                "Type": "Map",
+                "ItemProcessor": {
+                  "ProcessorConfig": {
+                    "Mode": "INLINE"
+                  },
+                  "StartAt": "VolumeInfo exists?",
+                  "States": {
+                    "VolumeInfo exists?": {
+                      "Type": "Choice",
+                      "Choices": [
+                        {
+                          "Not": {
+                            "Variable": "$.book.volumeInfo.description",
+                            "IsPresent": true
+                          },
+                          "Next": "No VolumeInfo found"
+                        }
+                      ],
+                      "Default": "VolumeInfo exists",
+                      "OutputPath": "$.book.volumeInfo"
+                    },
+                    "No VolumeInfo found": {
+                      "Type": "Pass",
+                      "Result": {},
+                      "End": true
+                    },
+                    "VolumeInfo exists": {
+                      "Type": "Pass",
+                      "Next": "Does book Description exist?"
+                    },
+                    "Does book Description exist?": {
+                      "Type": "Choice",
+                      "Choices": [
+                        {
+                          "Not": {
+                            "Variable": "$.description",
+                            "IsPresent": true
+                          },
+                          "Next": "No book Description found"
+                        }
+                      ],
+                      "Default": "Book description found, Get all of the PERSON values into an array"
+                    },
+                    "No book Description found": {
+                      "Type": "Pass",
+                      "End": true,
+                      "Result": {
+                        "error": "no book description"
+                      }
+                    },
+                    "Book description found, Get all of the PERSON values into an array": {
+                      "Type": "Task",
+                      "Parameters": {
+                        "LanguageCode": "en",
+                        "Text.$": "$.description"
+                      },
+                      "Resource": "arn:aws:states:::aws-sdk:comprehend:detectEntities",
+                      "ResultSelector": {
+                        "potential_author.$": "$..Entities[?(@.Type==PERSON && @.Score > .85)].Text"
+                      },
+                      "End": true,
+                      "OutputPath": "$.potential_author"
+                    }
+                  }
+                },
+                "ResultSelector": {
+                  "potential_authors.$": "States.ArrayUnique($[*][*])"
+                },
+                "ItemsPath": "$.items",
+                "ItemSelector": {
+                  "book.$": "$$.Map.Item.Value"
+                },
+                "End": true,
+                "MaxConcurrency": 40
+              }
+            }
+          }
+        ],
+        "ResultSelector": {
+          "first_book.$": "$[0].first_book",
+          "potential_authors.$": "$[1].potential_authors"
+        }
+      },
+      "No Books found": {
+        "Type": "Pass",
+        "End": true,
+        "Result": {
+          "error": "No books found"
+        }
+      },
+      "Do any potential authors exist?": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Not": {
+              "Variable": "$.potential_authors",
+              "IsPresent": true
+            },
+            "Next": "No potential authors found"
+          }
+        ],
+        "Default": "Potential Authors Map"
+      },
+      "No potential authors found": {
+        "Type": "Pass",
+        "End": true,
+        "Result": {
+          "error": "No potential mentioned authors found for "
+        }
+      },
+      "Potential Authors Map": {
+        "Type": "Map",
+        "ItemProcessor": {
+          "ProcessorConfig": {
+            "Mode": "INLINE"
+          },
+          "StartAt": "Is potential author name a good format?",
+          "States": {
+            "Is potential author name a good format?": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "And": [
+                    {
+                      "Variable": "$.Name",
+                      "StringMatches": "* *"
+                    },
+                    {
+                      "Not": {
+                        "Variable": "$.Name",
+                        "StringMatches": "*—*"
+                      }
+                    },
+                    {
+                      "Not": {
+                        "Variable": "$.Name",
+                        "StringMatches": "* '"
+                      }
+                    },
+                    {
+                      "Not": {
+                        "Variable": "$.Name",
+                        "StringMatches": "* “"
+                      }
+                    }
+                  ],
+                  "Next": "Good name format"
+                },
+                {
+                  "And": [
+                    {
+                      "Variable": "$.Name",
+                      "StringMatches": "* *"
+                    },
+                    {
+                      "Variable": "$.Name",
+                      "StringMatches": "*—*"
+                    }
+                  ],
+                  "Next": "Remove em dash"
+                },
+                {
+                  "And": [
+                    {
+                      "Variable": "$.Name",
+                      "StringMatches": "* *"
+                    },
+                    {
+                      "Variable": "$.Name",
+                      "StringMatches": "* '"
+                    }
+                  ],
+                  "Next": "Remove space and single quote"
+                },
+                {
+                  "And": [
+                    {
+                      "Variable": "$.Name",
+                      "StringMatches": "* *"
+                    },
+                    {
+                      "Variable": "$.Name",
+                      "StringMatches": "* “"
+                    }
+                  ],
+                  "Next": "Remove space and double quote"
+                }
+              ],
+              "Default": "Bad name format"
+            },
+            "Bad name format": {
+              "Type": "Pass",
+              "Parameters": {
+                "Format": "Bad",
+                "Name.$": "$.Name"
+              },
+              "End": true
+            },
+            "Remove single word Name": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Not": {
+                    "Variable": "$.Name",
+                    "StringMatches": "* *"
+                  },
+                  "Next": "Error - Single word Name"
+                }
+              ],
+              "Default": "Name with at least 2 words"
+            },
+            "Error - Single word Name": {
+              "Type": "Pass",
+              "End": true,
+              "Parameters": {
+                "Format": "Bad",
+                "Name.$": "$.Name"
+              }
+            },
+            "Name with at least 2 words": {
+              "Type": "Pass",
+              "End": true,
+              "Parameters": {
+                "Format": "Good",
+                "Name.$": "$.Name",
+                "Searched.$": "$$.Execution.Input.author",
+                "first_book.$": "$.first_book"
+              }
+            },
+            "Good name format": {
+              "Type": "Pass",
+              "Parameters": {
+                "Format": "Good",
+                "Name.$": "$.Name",
+                "Searched.$": "$$.Execution.Input.author",
+                "first_book.$": "$.first_book"
+              },
+              "Next": "Remove single word Name"
+            },
+            "Remove em dash": {
+              "Type": "Pass",
+              "Parameters": {
+                "Format": "Good",
+                "Name.$": "States.ArrayGetItem(States.StringSplit($.Name,'—'),0)",
+                "Searched.$": "$$.Execution.Input.author",
+                "first_book.$": "$.first_book"
+              },
+              "Next": "Remove single word Name"
+            },
+            "Remove space and single quote": {
+              "Type": "Pass",
+              "Parameters": {
+                "Format": "Good",
+                "Name.$": "States.ArrayGetItem(States.StringSplit($.Name,' \\''),0)",
+                "Searched.$": "$$.Execution.Input.author",
+                "first_book.$": "$.first_book"
+              },
+              "Next": "Remove single word Name"
+            },
+            "Remove space and double quote": {
+              "Type": "Pass",
+              "Parameters": {
+                "Format": "Good",
+                "Name.$": "States.ArrayGetItem(States.StringSplit($.Name,' “'),0)",
+                "Searched.$": "$$.Execution.Input.author",
+                "first_book.$": "$.first_book"
+              },
+              "Next": "Remove single word Name"
+            }
+          }
+        },
+        "ItemsPath": "$.potential_authors",
+        "ItemSelector": {
+          "Name.$": "$$.Map.Item.Value",
+          "first_book.$": "$.first_book"
+        },
+        "ResultSelector": {
+          "potential_authors.$": "$..[?(@.Format==Good && @.Name != @.Searched)].Name",
+          "Searched_author.$": "$$.Execution.Input.author",
+          "first_book.$": "States.ArrayGetItem($..[?(@.Format==Good && @.Name != @.Searched)].first_book,0)"
+        },
+        "Next": "Real Author Map",
+        "MaxConcurrency": 40
+      },
+      "Real Author Map": {
+        "Type": "Map",
+        "ItemProcessor": {
+          "ProcessorConfig": {
+            "Mode": "INLINE"
+          },
+          "StartAt": "Real Author or nah",
+          "States": {
+            "Real Author or nah": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::apigateway:invoke",
+              "Parameters": {
+                "ApiEndpoint": "${ApiEndpoint}",
+                "Method": "GET",
+                "Stage": "Prod",
+                "Path.$": "States.Format('{}&maxResults=10',States.JsonToString($.Name))"
+              },
+              "Next": "Is potential author a real author?",
+              "ResultPath": "$.Test"
+            },
+            "Is potential author a real author?": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.Test.ResponseBody.totalItems",
+                  "NumericGreaterThan": 0,
+                  "Next": "Is an author"
+                }
+              ],
+              "Default": "Not at author"
+            },
+            "Not at author": {
+              "Type": "Pass",
+              "End": true,
+              "Parameters": {
+                "Name.$": "$.Name",
+                "Is_An_Author": false
+              }
+            },
+            "Is an author": {
+              "Type": "Pass",
+              "Parameters": {
+                "Name.$": "$.Name",
+                "first_author_book.$": "States.ArrayGetItem($..items[0].id,0)",
+                "Is_An_Author": true,
+                "first_book.$": "$.first_book"
+              },
+              "Next": "Does author match the Searched Author?"
+            },
+            "Does author match the Searched Author?": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.first_book",
+                  "StringEqualsPath": "$.first_author_book",
+                  "Next": "Duplicate as Searched author"
+                }
+              ],
+              "Default": "Non-duplicate as searched author"
+            },
+            "Duplicate as Searched author": {
+              "Type": "Pass",
+              "End": true,
+              "Parameters": {
+                "Name.$": "$.Name",
+                "Is_An_Author": false
+              }
+            },
+            "Non-duplicate as searched author": {
+              "Type": "Pass",
+              "Parameters": {
+                "Name.$": "$.Name",
+                "first_author_book.$": "$.first_author_book",
+                "Is_An_Author": true
+              },
+              "ResultPath": "$.Payload",
+              "End": true
+            }
+          }
+        },
+        "ItemsPath": "$.potential_authors",
+        "ItemSelector": {
+          "Name.$": "$$.Map.Item.Value",
+          "first_book.$": "$.first_book"
+        },
+        "MaxConcurrency": 40,
+        "Next": "Return Unique Authors",
+        "ResultSelector": {
+          "authors.$": "States.ArrayUnique($..[?(@.Is_An_Author==true)].Name)",
+          "author.$": "States.ArrayUnique($..[?(@.Is_An_Author==true)])"
+        }
+      },
+      "Return Unique Authors": {
+        "Type": "Task",
+        "Resource":  "arn:aws:states:::lambda:invoke",
+        "Parameters": {
+          "Payload.$": "$",
+          "FunctionName" : "${NewNextReadArn}"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException",
+              "Lambda.TooManyRequestsException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "OutputPath": "$.Payload",
+        "Next": "Any authors?"
+      },
+      "Any authors?": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Not": {
+              "Variable": "$.authors[0]",
+              "IsPresent": true
+            },
+            "Next": "No authors found"
+          }
+        ],
+        "Default": "Each author, return books [title, thumbnail]"
+      },
+      "No authors found": {
+        "Type": "Pass",
+        "End": true,
+        "Result": {
+          "error": "No authors found"
+        }
+      },
+      "Each author, return books [title, thumbnail]": {
+        "Type": "Map",
+        "ItemProcessor": {
+          "ProcessorConfig": {
+            "Mode": "INLINE"
+          },
+          "StartAt": "Seperate author name, books info",
+          "States": {
+            "Seperate author name, books info": {
+              "Type": "Parallel",
+              "Branches": [
+                {
+                  "StartAt": "Author Name",
+                  "States": {
+                    "Author Name": {
+                      "Type": "Pass",
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "Return Google Books for first 10 books per author",
+                  "States": {
+                    "Return Google Books for first 10 books per author": {
+                      "Type": "Task",
+                      "Resource": "arn:aws:states:::apigateway:invoke",
+                      "Parameters": {
+                        "ApiEndpoint": "${ApiEndpoint}",
+                        "Method": "GET",
+                        "Stage": "Prod",
+                        "Path.$": "States.Format('\"{}\"&maxResults=10',$.current_author)"
+                      },
+                      "ResultSelector": {
+                        "ResponseBody.$": "$.ResponseBody"
+                      },
+                      "Next": "First 10 books map"
+                    },
+                    "First 10 books map": {
+                      "Type": "Map",
+                      "ItemProcessor": {
+                        "ProcessorConfig": {
+                          "Mode": "INLINE"
+                        },
+                        "StartAt": "Choice - Do the title, ISBNs and thumbnail exist?",
+                        "States": {
+                          "Choice - Do the title, ISBNs and thumbnail exist?": {
+                            "Type": "Choice",
+                            "Choices": [
+                              {
+                                "And": [
+                                  {
+                                    "Variable": "$.volumeInfo.imageLinks.thumbnail",
+                                    "IsPresent": true
+                                  },
+                                  {
+                                    "Variable": "$.volumeInfo.title",
+                                    "IsPresent": true
+                                  },
+                                  {
+                                    "Variable": "$.volumeInfo.industryIdentifiers",
+                                    "IsPresent": true
+                                  }
+                                ],
+                                "Next": "Good book title and thumbnail"
+                              }
+                            ],
+                            "Default": "No book title, ISBNs or thumbnail"
+                          },
+                          "Good book title and thumbnail": {
+                            "Type": "Pass",
+                            "Parameters": {
+                              "title.$": "$.volumeInfo.title",
+                              "thumbnail.$": "$.volumeInfo.imageLinks.thumbnail",
+                              "isbn.$": "$..volumeInfo.industryIdentifiers[?(@.type==ISBN_13)].identifier"
+                            },
+                            "Next": "Get ISBN_13 first array into into a String"
+                          },
+                          "Get ISBN_13 first array into into a String": {
+                            "Type": "Pass",
+                            "End": true,
+                            "Parameters": {
+                              "title.$": "$.title",
+                              "thumbnail.$": "$.thumbnail",
+                              "isbn.$": "$.isbn[0]"
+                            }
+                          },
+                          "No book title, ISBNs or thumbnail": {
+                            "Type": "Pass",
+                            "End": true,
+                            "Parameters": {
+                              "error": "No book title, ISBNs or thumbnail"
+                            }
+                          }
+                        }
+                      },
+                      "ItemsPath": "$.ResponseBody.items",
+                      "End": true
+                    }
+                  }
+                }
+              ],
+              "End": true,
+              "ResultSelector": {
+                "author.$": "$[0].current_author",
+                "book_results.$": "$[1][?(@.title && @.isbn && @.thumbnail)]"
+              }
+            }
+          }
+        },
+        "ItemSelector": {
+          "current_author.$": "$$.Map.Item.Value"
+        },
+        "ItemsPath": "$.authors",
+        "MaxConcurrency": 40,
+        "End": true,
+        "ResultSelector": {
+          "authors.$": "$..[?(@.book_results[0])]"
+        }
+      }
+    }
+  }
