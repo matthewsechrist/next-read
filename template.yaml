@@ -200,7 +200,7 @@ Resources:
       Name: next-read
       StageName: Prod
       Domain:
-        DomainName: nextreadapi2.matthewsechrist.cloud
+        DomainName: nextreadapi.matthewsechrist.cloud
         CertificateArn: !Ref ApiCertificate
         EndpointConfiguration: REGIONAL
         Route53:
