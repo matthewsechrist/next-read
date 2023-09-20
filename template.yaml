@@ -206,43 +206,6 @@ Resources:
         Route53:
           HostedZoneName: matthewsechrist.cloud.
 
-  #NextReadDomainName:  
-  #  Type: 'AWS::ApiGateway::DomainName'
-  #  Properties:
-  #    DomainName: nextreadapi.matthewsechrist.cloud
-  #    EndpointConfiguration: 
-  #      Types:
-  #        - REGIONAL
-  #    CertificateArn: !Ref ApiCertificate
-#
-  #BasePath:
-  #  Type: AWS::ApiGateway::BasePathMapping
-  #  Properties:
-  #    DomainName: nextreadapi.matthewsechrist.cloud
-  #    RestApiId: !Ref NextReadApi  # This is my AWS::Serverless::Api resource
-  #    Stage: !Ref NextReadApi.Stage 
-
-  #myDNSRecord:
-  #  Type: AWS::Route53::RecordSet
-  #  Properties:
-  #    AliasTarget:
-  #      DNSName: !GetAtt [NextReadDomainName, RegionalDomainName]
-  #      HostedZoneId: !GetAtt [NextReadDomainName, RegionalHostedZoneId]
-  #    HostedZoneName: matthewsechrist.cloud.
-  #    Name: 'nextreadapi.matthewsechrist.cloud'
-  #    Type: A
-
-  #NextReadDeployment:
-  #  DependsOn:
-  #    - GetAuthorProxyMethod
-  #    - GetAuthorOptionsMethod
-  #    - NewNextReadOptionsMethod
-  #    - NewNextReadMethod
-  #  Type: AWS::ApiGateway::Deployment
-  #  Properties:
-  #    RestApiId: !Ref NextReadApi
-  #    StageName: !Ref NextReadApi.Stage
-
 Outputs:
   NextReadApi:
     Description: "NextReadApi ARN"
