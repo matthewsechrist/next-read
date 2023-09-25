@@ -106,7 +106,6 @@ async function searchAuthor() {
         .appendChild(error_div);
       document.getElementById("mentioned_authors").removeAttribute("hidden");
       document.getElementById("error_message").removeAttribute("hidden");
-
     }
   }
   spinner.setAttribute("hidden", "");
