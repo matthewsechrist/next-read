@@ -5,6 +5,7 @@ on:
     paths:
       - nextread.html
       - assets/js/books.js
+      - assets/css/nextread.css
 
 jobs:
   Build_and_Upload:
