@@ -227,6 +227,7 @@ img:hover {
 
 a:link, a:active,a:visited,#fa-solid  {
   color: #fefefe;
+  text-decoration: none;
 }
 
 a:hover {
