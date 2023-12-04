@@ -16,7 +16,7 @@ async function searchAuthor() {
   spinner.setAttribute("hidden", "");
 
   if (searched_author) {
-    spinner.removeAttribute("hidden");
+    spinner.removeAttribute("hidden");  
 
     let results = await fetch(
       "https://nextreadapi.matthewsechrist.cloud/new_next_read",
