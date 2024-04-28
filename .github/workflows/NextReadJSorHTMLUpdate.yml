@@ -14,7 +14,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Generate Tag Version'
         id: generate_tag_version
         run: |
@@ -23,7 +23,7 @@ jobs:
           echo "Tag Version: $TAG" >> $GITHUB_STEP_SUMMARY  
 
       - name: 'Configure AWS Credentials'
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -37,7 +37,7 @@ jobs:
              aws s3 cp assets/css/nextread.css s3://${{ secrets.AWS_S3_FRONT_END_BUCKET_NAME }}/assets/css/
 
 
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         name: 'Create Git Tag'
         with:
           script: |
